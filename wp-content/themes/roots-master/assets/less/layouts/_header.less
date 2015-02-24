@@ -1,0 +1,128 @@
+@import (reference) "../_variables.less";
+
+.banner {
+  background: linear-gradient(to bottom, #d6d6d6 0%,#e5e5e5 30%,#e5e5e5 70%,#d6d6d6 100%);
+  margin-bottom: 0;
+  border: none;
+
+  .container {
+    position: relative;
+  }
+
+  img.header-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 110%;
+
+    @media (max-width: 767px) {
+      position: absolute;
+      top: 5px;
+      bottom: auto;
+      left: 5px;
+      right: auto;
+      width: 135px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .navbar-collapse {
+      margin: 50px -15px 0;
+    }
+  }
+
+  .navbar-toggle {
+      background-color: transparent;
+      margin-right: 0;
+      border: 0;
+      border-left: 1px solid #ccc;
+      border-radius: 0;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+      right: 0;
+      height: 50px;
+      margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    height: 152px;
+    overflow: hidden;
+
+    .col-sm-9 {
+      position: static;
+    }
+  }
+
+  .navbar-collapse {
+    @media (max-width: 767px) {
+      .nav.navbar-nav {
+        margin-top: 0;
+      }
+      .nav.navbar-nav li {
+        border-top: 1px dotted #ffffff;
+      }
+      .nav.navbar-nav li.active a {
+        background: #ccc !important;
+      }
+    }
+    @media (min-width: 768px) {
+      position: absolute;
+      margin-left: 25%;
+      bottom: 0px;
+      left: 0;
+
+      ul li {
+        margin-left: 5px;
+
+        &:first-of-type {
+          margin-left: 15px;
+        }
+      }
+
+      ul li a {
+        transition: all 500ms ease;
+      }
+
+      ul li.active a,
+      ul li.active a:hover,
+      ul li a:hover {
+        background-color: #ffffff !important;
+        background-color: rgba(242, 242, 242, 1) !important;
+        box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+        color: @brand-primary;
+      }
+    }
+  }
+
+  address {
+    position: absolute;
+    right: 0;
+    top: 25px;
+    text-align: right;
+    font-size: .8em;
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+
+    a {
+      color: #777777;
+    }
+
+    strong {
+      color: @brand-primary;
+      font-size: 1.1em;
+      text-shadow: 1px 1px 0 rgba(255,255,255,.8);
+    }
+  }
+
+  .aside {
+    margin-top: 102px;
+    height: 50px;
+    font-size: 1.8em;
+    line-height: 54px;
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+  }
+}

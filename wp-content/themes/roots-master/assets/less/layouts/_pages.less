@@ -1,0 +1,71 @@
+.aside {
+  background-color: darken(@brand-primary, 10%);
+  color: #fff;
+  font-size: .9em;
+}
+.main-content {
+  background: url("/wp-content/themes/roots-master/assets/img/bgrp.jpg");
+}
+.hours {
+  width: 100%;
+  td {
+    vertical-align: middle;
+  }
+  tr > td:first-of-type {
+    max-width: 200px;
+  }
+}
+.google-map {
+  position: relative;
+  padding-top: 70.6%;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+  }
+}
+.main {
+  background: #ffffff;
+  @media (min-width: 768px) {
+    .col-sm-9 {
+      margin-left: 25%;
+    }
+  }
+
+  .aside {
+    h3 {
+      margin: 5px 0 15px;
+
+      &:after {
+        content: "";
+        display: block;
+        margin-top: 5px;
+        background: linear-gradient(to right, @brand-primary 0%,#5992cc 48%,@brand-primary 100%);
+        height: 2px;
+      }
+    }
+    @media (min-width: 768px) {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, @brand-primary 0%,darken(@brand-primary, 10%) 34%,darken(@brand-primary, 10%) 100%);
+
+      &:before {
+        display: block;
+        content: "";
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #0066cc 0%,#5992cc 48%,#0066cc 100%);
+      }
+    }
+    @media (max-width: 767px) {
+      padding: 15px 15px;
+    }
+  }
+}
+
