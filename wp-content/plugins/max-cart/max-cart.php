@@ -14,9 +14,11 @@
  */
 
 require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.class.php' );
+require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.product.class.php' );
 
 if (is_admin()) {
 	require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.product-admin.class.php' );
+
 }
 
 

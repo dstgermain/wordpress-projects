@@ -7,18 +7,39 @@
  */
 
 class maxCart {
-
+	// post_type constants
 	const MAX_CART_PRODUCT = 'maxcart_product';
 	const MAX_CART_COMPANY = 'maxcart_company';
-	const MAX_CART_CATEGORY = 'maxcart_category';
     const MAX_CART_ORDER = 'maxcart_order';
 	const MAX_CART_PERSIST = 'maxcart_persist';
     const MAX_CART_WISHLIST = 'maxcart_wishlist';
+
+	// product taxonomy
+	const MAX_CART_CATEGORY = 'maxcart_category';
+	const MAX_CART_VARIATION = 'maxcart_variation';
+
+	// product_meta constants
+	const P_GALLERY_KEY = '_maxcart_product_gallery';
+	const P_WEIGHT_KEY = '_maxcart_product_weight';
+	const P_LENGTH_KEY = '_maxcart_product_length';
+	const P_WIDTH_KEY = '_maxcart_product_width';
+	const P_HEIGHT_KEY = '_maxcart_product_height';
+	const P_FLATRATE_KEY = '_maxcart_product_flatrate';
+
+	const P_COMPANY_KEY = '_maxcart_company_id';
+	const P_PRICE_KEY = '_maxcart_product_price';
+	const P_TAX_EXEMPT_KEY = '_maxcart_product_taxexempt';
+	const P_TAX_KEY = '_maxcart_product_tax';
+	const P_SKU_KEY = '_maxcart_product_sku';
+	const P_STOCK_KEY = '_maxcart_product_stock';
+
+	//
 
 	public function __construct() {
 		// adding Product post_type
 		add_action( 'init', array( $this, 'product_init' ) );
 		add_filter( 'post_updated_messages', array( $this, 'product_updated_messages' ) );
+		add_filter( 'single_template', array( $this, 'get_product_template' ) );
 
 		// adding Company post_type
 		add_action( 'init', array( $this, 'product_company_init' ) );
@@ -26,6 +47,9 @@ class maxCart {
 
 		// adding Category Taxonomy
 		add_action( 'init', array( $this, 'create_categories_init' ), 0 );
+
+		// adding Variation Taxonomy
+		add_action( 'init', array( $this, 'create_variations_init' ), 0 );
 
 		// adding Orders post_type
 		add_action( 'init', array( $this, 'order_init' ) );
@@ -42,6 +66,10 @@ class maxCart {
 
 		// init rewrites
 		register_activation_hook( __FILE__, array( $this, 'my_rewrite_flush' ) );
+
+		add_action( 'admin_enqueue_scripts', array($this, 'add_admin_scripts') );
+
+		add_action( 'wp_enqueue_scripts', array( $this, 'add_product_scripts' ) );
 	}
 
 	function my_rewrite_flush() {
@@ -86,10 +114,10 @@ class maxCart {
 			'hierarchical'       => true,
 			'menu_position'      => 5,
 			'menu_icon'          => 'dashicons-cart',
-			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt' )
+			'supports'           => array( 'title', 'editor' )
 		);
 
-		register_post_type( maxCart::MAX_CART_PRODUCT, $args );
+		register_post_type( self::MAX_CART_PRODUCT, $args );
 	}
 
 	/**
@@ -104,7 +132,7 @@ class maxCart {
 		$post_type        = get_post_type( $post );
 		$post_type_object = get_post_type_object( $post_type );
 
-		$messages[maxCart::MAX_CART_PRODUCT] = array(
+		$messages[self::MAX_CART_PRODUCT] = array(
 			0  => '', // Unused. Messages start at index 1.
 			1  => __( 'Product updated.', 'max_cart_textdomain' ),
 			2  => __( 'Custom field updated.', 'max_cart_textdomain' ),
@@ -136,6 +164,15 @@ class maxCart {
 		}
 
 		return $messages;
+	}
+
+	public function get_product_template($single_template) {
+		global $post;
+
+		if ($post->post_type === self::MAX_CART_PRODUCT) {
+			$single_template = ABSPATH . 'wp-content/plugins/max-cart/templates/product-single.php';
+		}
+		return $single_template;
 	}
 
 	/**
@@ -176,7 +213,7 @@ class maxCart {
 			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt' )
 		);
 
-		register_post_type( maxCart::MAX_CART_COMPANY, $args );
+		register_post_type( self::MAX_CART_COMPANY, $args );
 	}
 
 	/**
@@ -191,7 +228,7 @@ class maxCart {
 		$post_type        = get_post_type( $post );
 		$post_type_object = get_post_type_object( $post_type );
 
-		$messages[maxCart::MAX_CART_COMPANY] = array(
+		$messages[self::MAX_CART_COMPANY] = array(
 			0  => '', // Unused. Messages start at index 1.
 			1  => __( 'Company updated.', 'max_cart_textdomain' ),
 			2  => __( 'Custom field updated.', 'max_cart_textdomain' ),
@@ -253,7 +290,38 @@ class maxCart {
 			'rewrite'           => array( 'slug' => 'category' ),
 		);
 
-		register_taxonomy( maxCart::MAX_CART_CATEGORY, array( maxCart::MAX_CART_PRODUCT ), $args );
+		register_taxonomy( self::MAX_CART_CATEGORY, array( self::MAX_CART_PRODUCT ), $args );
+	}
+
+	/**
+	 * Product variations taxonomy
+	 * @author Daniel St. Germain
+	 */
+	function create_variations_init() {
+		$labels = array(
+			'name'              => _x( 'Product Variations', 'taxonomy general name' ),
+			'singular_name'     => _x( 'Product Variation', 'taxonomy singular name' ),
+			'search_items'      => __( 'Search Variations' ),
+			'all_items'         => __( 'All Variations' ),
+			'parent_item'       => __( 'Parent Variation' ),
+			'parent_item_colon' => __( 'Parent Variation:' ),
+			'edit_item'         => __( 'Edit Variation' ),
+			'update_item'       => __( 'Update Variation' ),
+			'add_new_item'      => __( 'Add New Variation' ),
+			'new_item_name'     => __( 'New Category Variation' ),
+			'menu_name'         => __( 'Product Variations' ),
+		);
+
+		$args = array(
+			'hierarchical'      => true,
+			'labels'            => $labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => false,
+		);
+
+		register_taxonomy( self::MAX_CART_VARIATION, array( self::MAX_CART_PRODUCT ), $args );
 	}
 
 	/**
@@ -264,16 +332,16 @@ class maxCart {
 	 */
 	public function order_init() {
 		$labels = array(
-			'name'               => _x( 'Order Numbers & Tracking', 'post type general name', 'max_cart_textdomain' ),
-			'singular_name'      => _x( 'Order Numbers & Tracking', 'post type singular name', 'max_cart_textdomain' ),
-			'menu_name'          => _x( 'Order Numbers & Tracking', 'admin menu', 'max_cart_textdomain' ),
+			'name'               => _x( 'Orders', 'post type general name', 'max_cart_textdomain' ),
+			'singular_name'      => _x( 'Orders', 'post type singular name', 'max_cart_textdomain' ),
+			'menu_name'          => _x( 'Orders', 'admin menu', 'max_cart_textdomain' ),
 			'name_admin_bar'     => _x( 'Order', 'add new on admin bar', 'max_cart_textdomain' ),
 			'add_new'            => _x( 'Add Order', 'book', 'max_cart_textdomain' ),
 			'add_new_item'       => __( 'Add New Order', 'max_cart_textdomain' ),
 			'new_item'           => __( 'New Order', 'max_cart_textdomain' ),
 			'edit_item'          => __( 'Edit Order', 'max_cart_textdomain' ),
 			'view_item'          => __( 'View Order', 'max_cart_textdomain' ),
-			'all_items'          => __( 'Order Numbers & Tracking', 'max_cart_textdomain' ),
+			'all_items'          => __( 'Orders & Tracking', 'max_cart_textdomain' ),
 			'search_items'       => __( 'Search Orders', 'max_cart_textdomain' ),
 			'parent_item_colon'  => __( 'Parent Orders:', 'max_cart_textdomain' ),
 			'not_found'          => __( 'No Orders found.', 'max_cart_textdomain' ),
@@ -295,7 +363,7 @@ class maxCart {
 			'supports'           => array( 'title', 'author' )
 		);
 
-		register_post_type( maxCart::MAX_CART_ORDER, $args );
+		register_post_type( self::MAX_CART_ORDER, $args );
 	}
 
 	/**
@@ -310,7 +378,7 @@ class maxCart {
 		$post_type        = get_post_type( $post );
 		$post_type_object = get_post_type_object( $post_type );
 
-		$messages[maxCart::MAX_CART_ORDER] = array(
+		$messages[self::MAX_CART_ORDER] = array(
 			0  => '', // Unused. Messages start at index 1.
 			1  => __( 'Order updated.', 'max_cart_textdomain' ),
 			2  => __( 'Custom field updated.', 'max_cart_textdomain' ),
@@ -370,7 +438,7 @@ class maxCart {
 			'supports'           => array( 'title' )
 		);
 
-		register_post_type( maxCart::MAX_CART_PERSIST, $args );
+		register_post_type( self::MAX_CART_PERSIST, $args );
 	}
 
 	/**
@@ -399,7 +467,7 @@ class maxCart {
 			'supports'           => array( 'title' )
 		);
 
-		register_post_type( maxCart::MAX_CART_WISHLIST, $args );
+		register_post_type( self::MAX_CART_WISHLIST, $args );
 	}
 
 	public function clean_submenu() {
@@ -407,6 +475,20 @@ class maxCart {
 			global $submenu;
 			unset($submenu['edit.php?post_type=maxcart_product'][10]); // Removes 'Add New'.
 		}
+	}
+
+	public function add_product_scripts() {
+		wp_enqueue_script( 'maxcart-product', '/wp-content/plugins/max-cart/resources/js/maxcart-product.js' );
+
+		wp_register_style( 'maxcart-styles', '/wp-content/plugins/max-cart/resources/css/maxcart-main.min.css');
+		wp_enqueue_style( 'maxcart-styles' );
+	}
+
+	public function add_admin_scripts() {
+		wp_register_style( 'maxcart-admin-css', '/wp-content/plugins/max-cart/resources/admin/css/maxcart-admin.min.css' );
+		wp_enqueue_style( 'maxcart-admin-css' );
+
+		wp_enqueue_script( 'maxcart-admin', '/wp-content/plugins/max-cart/resources/admin/js/maxcart-admin.js', null, '0.0.1', true );
 	}
 
 }
