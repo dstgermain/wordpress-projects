@@ -6731,6 +6731,9 @@ body {
 .padding-bottom_15 {
   padding-bottom: 15px;
 }
+.container-fluid {
+  max-width: 1170px;
+}
 .banner {
   background: -webkit-gradient(linear, left top, left bottom, from(#d6d6d6), color-stop(30%, #e5e5e5), color-stop(70%, #e5e5e5), to(#d6d6d6));
   background: -webkit-linear-gradient(top, #d6d6d6 0%, #e5e5e5 30%, #e5e5e5 70%, #d6d6d6 100%);
@@ -6743,10 +6746,8 @@ body {
   position: relative;
 }
 .banner img.header-logo {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 110%;
+  position: relative;
+  bottom: -29px;
 }
 @media (max-width: 767px) {
   .banner img.header-logo {
@@ -6777,8 +6778,9 @@ body {
   margin: 0;
 }
 @media (min-width: 768px) {
-  .banner {
-    height: 152px;
+  .banner .row {
+    position: relative;
+    height: 130px;
     overflow: hidden;
   }
   .banner .col-sm-9 {
@@ -6826,8 +6828,8 @@ body {
 }
 .banner address {
   position: absolute;
-  right: 0;
-  top: 25px;
+  right: 15px;
+  top: 15px;
   text-align: right;
   font-size: .8em;
 }

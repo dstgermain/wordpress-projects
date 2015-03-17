@@ -1,12 +1,11 @@
 <header class="banner navbar navbar-default navbar-static-top" role="banner">
-	<div class="container">
+	<div class="container-fluid">
 		<div class="row">
-			<div class="col-sm-3 hidden-xs aside">
+			<div class="col-sm-3 hidden-xs">
 				<img src="/wp-content/themes/roots-master/assets/img/logo.svg" class="header-logo"/>
-				Our Office's
 			</div>
 			<div class="col-sm-9">
-				<div class="navbar-header">
+				<div class="navbar-header visible-xs">
 					<img src="/wp-content/themes/roots-master/assets/img/logo.svg" class="header-logo"/>
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 						<span class="sr-only">Toggle navigation</span>

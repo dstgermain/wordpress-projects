@@ -10,10 +10,8 @@
   }
 
   img.header-logo {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 110%;
+    position: relative;
+    bottom: -29px;
 
     @media (max-width: 767px) {
       position: absolute;
@@ -46,8 +44,11 @@
   }
 
   @media (min-width: 768px) {
-    height: 152px;
-    overflow: hidden;
+    .row {
+      position: relative;
+      height: 130px;
+      overflow: hidden;
+    }
 
     .col-sm-9 {
       position: static;
@@ -97,8 +98,8 @@
 
   address {
     position: absolute;
-    right: 0;
-    top: 25px;
+    right: 15px;
+    top: 15px;
     text-align: right;
     font-size: .8em;
 
