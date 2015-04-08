@@ -225,7 +225,12 @@ class maxCartProductAdmin extends maxCart {
 	 */
 	function display_product_gallery_metabox() {
 		global $post;
-		$ids = implode(',', get_post_meta( $post->ID, parent::P_GALLERY_KEY, true ));
+		if (isset($post->ID)) {
+			$gallery_info = get_post_meta( $post->ID, parent::P_GALLERY_KEY, true );
+			if ( $gallery_info ) {
+				$ids = implode( ',', get_post_meta( $post->ID, parent::P_GALLERY_KEY, true ) );
+			}
+		}
 
 		wp_nonce_field('maxcart_product_metabox_nonce', 'product_meta_box_nonce');
 

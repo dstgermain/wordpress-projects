@@ -20,7 +20,8 @@ module.exports = function(grunt) {
             all: [
                 'Gruntfile.js',
                 'resources/**/*.js',
-                '!resources/**/*.min.*'
+                '!resources/**/*.min.js',
+                '!resources/third_party/*'
             ]
         },
         less: {

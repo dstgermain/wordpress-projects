@@ -12,44 +12,41 @@ $maxCartProduct = new maxCartProduct();
 
 <div class="max-product-wrapper col-sm-12">
 	<ul class="max-product-breadcrumbs list-inline"><?php echo $maxCartProduct->product_categories; ?></ul>
-</div>
-
-<div class="col-sm-12">
-	<div class="max-product-wrapper row">
+	<div class="row">
 		<div class="col-sm-7">
 			<div class="max-product-main">
+				<?php if ( isset( $maxCartProduct->product_gallery_sizes[0] ) && !empty($maxCartProduct->product_gallery_sizes[0]['full']) ) : ?>
 
-				<?php if ( count( $maxCartProduct->product_gallery_sizes ) ) : ?>
-					<div class="vertical-align-table">
-						<div class="vertical-align-row">
-							<div class="vertical-align-cell">
-								<div class="max-product-main-image">
-								<img src="<?php echo $maxCartProduct->product_gallery_sizes[0]['large'][0]; ?>"
+					<div class="max-product-main-image">
+						<?php $first = true; $index = 0; foreach ($maxCartProduct->product_gallery_sizes as $img_array ) : ?>
+							<a class="fancybox <?php echo $first ? 'active': ''; $first = false; ?>"
+							   rel="group"
+							   data-gallery-id="<?php echo $index; $index++; ?>"
+							   href="<?php echo $img_array['full'][0]; ?>">
+								<img src="<?php echo $img_array['large'][0]; ?>"
 								     alt="<?php echo get_the_title(); ?>"
-								     class="img-responsive js-max-main-image js-max-view-full"
-								     data-large="<?php echo $maxCartProduct->product_gallery_sizes[0]['large'][0]; ?>"
-								     data-full="<?php echo $maxCartProduct->product_gallery_sizes[0]['full'][0]; ?>" />
-								</div>
-							</div>
-						</div>
+								     class="img-responsive"/>
+							</a>
+						<?php endforeach; ?>
 					</div>
 
 				<?php else : ?>
-
+					<div class="max-product-main-image missing">
+						<i class="fa fa-question-circle fa-4x"></i>
+					</div>
 				<?php endif; ?>
 
 			</div>
 
 			<div class="max-product-images">
 
-				<?php if ( count( $maxCartProduct->product_gallery_sizes ) > 1 ) : $first = true; ?>
+				<?php if ( count( $maxCartProduct->product_gallery_sizes ) > 1 ) : $first = true; $index = 0; ?>
 					<div class="max-product-gallery list-inline row">
 						<?php foreach ($maxCartProduct->product_gallery_sizes as $img_array ) : ?>
 							<div class="col-xs-4 col-sm-3">
 								<img src="<?php echo $img_array['thumbnail'][0]; ?>"
 								     alt="<?php echo get_the_title(); ?>"
-								     data-large="<?php echo $img_array['large'][0]; ?>"
-								     data-full="<?php echo $img_array['full'][0]; ?>"
+								     data-gallery-id="<?php echo $index; $index++; ?>"
 								     class="img-responsive js-max-gallery-image <?php echo $first ? 'active': ''; $first = false; ?>"/>
 							</div>
 						<?php endforeach; ?>
@@ -64,39 +61,46 @@ $maxCartProduct = new maxCartProduct();
 			<h1><?php echo get_the_title(); ?></h1>
 
 			<?php if ($maxCartProduct->product_company && isset( $maxCartProduct->product_company->post_title ) ) : ?>
-				<h3><?php echo $maxCartProduct->product_company->post_title;?></h3>
+				<h4>by: <a href="<?php echo $maxCartProduct->product_company->guid; ?>"><?php echo $maxCartProduct->product_company->post_title;?></a></h4>
 			<?php endif; ?>
 
-			<h4 class="max-product-price"><?php echo $maxCartProduct->product_price; ?>
+			<h4 class="max-product-price"><?php echo '$' . $maxCartProduct->product_price; ?>
 				<?php if ($maxCartProduct->product_stock) : ?>
 					<small class="max-product-stock">
-					in stock
+						in stock
 						<?php if ($maxCartProduct->product_stock < 20) : ?>
 							(only <?php echo $maxCartProduct->product_stock; ?> left!)
 						<?php endif; ?>
-			  	  </small>
+					</small>
 				<?php endif; ?>
 			</h4>
+			<div class="max-select-group">
+				<label for="product-qty">QTY</label>
+				<select name="" id="product-qty" class="js-max-select hidden">
 
-			<label for="maxProductQty">QTY</label>
-			<select name="" id="maxProductQty" class="js-max-select">
+					<?php if ($maxCartProduct->product_stock) : ?>
 
-				<?php if ($maxCartProduct->product_stock) : ?>
+						<?php for ($i = 1; $i <= $maxCartProduct->product_stock && $i <= 10; $i++) : ?>
+							<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+						<?php endfor; ?>
 
-					<?php for ($i = 1; $i <= $maxCartProduct->product_stock && $i <= 10; $i++) : ?>
-						<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-					<?php endfor; ?>
+					<?php else : ?>
 
-				<?php else : ?>
+						<?php for ($i = 1; $i <= 10; $i++) : ?>
+							<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+						<?php endfor; ?>
 
-					<?php for ($i = 1; $i <= 10; $i++) : ?>
-						<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-					<?php endfor; ?>
+					<?php endif; ?>
 
-				<?php endif; ?>
-
-			</select><br/>
-			<button class="js-max-product-add max-product-btn max-success">add to cart</button>
+				</select>
+			</div>
+			<input type="hidden" id="product-id" value="<?php echo $maxCartProduct->product_id;?>"/>
+			<input type="hidden" id="product-url" value="<?php echo $maxCartProduct->product_url;?>"/>
+			<input type="hidden" id="product-name" value="<?php echo get_the_title();?>"/>
+			<input type="hidden" id="product-price" value="<?php echo $maxCartProduct->product_price;?>"/>
+			<input type="hidden" id="product-thumbnail" value="<?php echo $maxCartProduct->product_gallery_sizes[0] ? $maxCartProduct->product_gallery_sizes[0]['thumbnail'][0] : '';?>"/>
+			<button class="js-max-product-add max-product-btn max-success" data-bind="click: _add, attr:{disabled: processing}"><span class="fa fa-spinner fa-spin"></span>add to cart</button>
+			<?php wp_nonce_field( 'add_product_to_cart', 'verify_product_add_to_cart' ); ?>
 		</div><!--	end product-info-->
 
 	</div><!-- end product-wrapper -->
