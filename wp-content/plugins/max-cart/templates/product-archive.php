@@ -6,17 +6,13 @@
  * Time: 8:29 PM
  */
 $maxCartProductArchive = new maxCartProductArchive;
-$maxCartFilters = new maxCartFilters;
 ?>
 <div class="max-product-wrapper col-sm-12">
 	<ul class="max-product-breadcrumbs list-inline">
 		<?php echo $maxCartProductArchive->breadcrumbs; ?>
 	</ul>
 	<div class="clearfix max-filters">
-		<div class="pull-left">
-			<?php $maxCartFilters->print_filters() ?>
-		</div>
-		<div class="margin-bottom_15 pull-right">
+		<div class="margin-bottom_15">
 			<?php wp_nonce_field( 'maxcart_ajax', 'verify_maxcart_ajax' ); ?>
 			<select name="orderBy" id="orderBy" class="js-max-select js-max-orderby hidden" data-type="orderBy">
 				<option value="price:ASC">Price Ascending</option>

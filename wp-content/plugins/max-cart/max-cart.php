@@ -72,6 +72,7 @@ class customTemplates {
 
 		$this->templates = array(
 			'templates/cart-tpl.php' => 'Cart View',
+			'templates/checkout-tpl.php' => 'Checkout Page'
 		);
 	}
 
@@ -120,7 +121,36 @@ class customTemplates {
 	}
 }
 
-
 add_action( 'plugins_loaded', array( 'customTemplates', 'get_instance' ) );
+
+class maxCartFiltersWidget extends WP_Widget {
+
+	public function __construct() {
+		parent::__construct(
+			'maxcart-filters', // Base ID
+			'MaxCart Filters', // Name
+			array( 'classname' => 'maxcart-filters', 'description' => __( 'MaxCart Ajax Filters.', 'text_domain' ) ) // Args
+		);
+	}
+
+	function widget( $args, $instance ) {
+		$widget = new maxCartFilters();
+		$widget->print_filters();
+	}
+
+	function update( $new_instance, $old_instance ) {
+		// Save widget options
+	}
+
+	function form( $instance ) {
+		echo 'no options available';
+	}
+}
+
+function maxcart_register_widgets() {
+	register_widget( 'maxCartFiltersWidget' );
+}
+
+add_action( 'widgets_init', 'maxcart_register_widgets' );
 
 

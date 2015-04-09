@@ -26,8 +26,6 @@ class maxCartProductAdmin extends maxCart {
 	private $side_meta_keys = array(
 		parent::P_COMPANY_KEY    => 'companyID',
 		parent::P_PRICE_KEY      => 'productPrice',
-		parent::P_TAX_EXEMPT_KEY => 'productTaxExempt',
-		parent::P_TAX_KEY        => 'productTax',
 		parent::P_SKU_KEY        => 'productSku',
 		parent::P_STOCK_KEY      => 'productStock'
 	);
@@ -98,29 +96,12 @@ class maxCartProductAdmin extends maxCart {
 		global $post;
 
 		$price = get_post_meta($post->ID, parent::P_PRICE_KEY, true);
-		$tax_exempt = get_post_meta($post->ID, parent::P_TAX_EXEMPT_KEY, true);
-		$tax = get_post_meta($post->ID, parent::P_TAX_KEY, true);
 
 		?>
 		<table>
 			<tr>
 				<td><label for="productPrice">Price:</label></td>
 				<td><input type="text" name="productPrice" value="<?php echo $price; ?>"/></td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<p>
-						<small>If this product is taxable add the taxable value (currency) below.</small>
-					</p>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="productTaxExempt">Tax Exempt:</label></td>
-				<td><input type="checkbox" name="productTaxExempt" class="js-maxcart-show" data-show="#tax-price" <?php echo ($tax_exempt === 'off') ? '' : 'checked' ?>/></td>
-			</tr>
-			<tr id="tax-price" class="<?php echo ($tax_exempt !== 'off') ? 'hidden' : '' ?>">
-				<td><label for="productPrice">Taxable Price:</label></td>
-				<td><input type="text" name="productTax" value="<?php echo $tax; ?>"/></td>
 			</tr>
 		</table>
 	<?php

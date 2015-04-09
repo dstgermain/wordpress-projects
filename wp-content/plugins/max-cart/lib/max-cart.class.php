@@ -517,10 +517,10 @@ if (!class_exists('maxCart')) {
 			wp_enqueue_script('fancy-box', '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js', array('jquery'), false, true );
 
 			wp_enqueue_script( 'maxcart-knockout', '/wp-content/plugins/max-cart/resources/third_party/knockout-3.3.0.js', array('jquery'), false, true );
-			wp_enqueue_script( 'maxcart-product', '/wp-content/plugins/max-cart/resources/js/maxcart-product.js', array('jquery'), false, true );
+			wp_enqueue_script( 'maxcart-product', '/wp-content/plugins/max-cart/resources/js/maxcart-product.js', array('maxcart-knockout'), false, true );
 
 			wp_enqueue_script( 'maxcart-utilities', '/wp-content/plugins/max-cart/resources/js/maxcart-utilities.js', array('jquery'), false, true );
-			wp_enqueue_script( 'maxcart-filters', '/wp-content/plugins/max-cart/resources/js/maxcart-filters.js', array('jquery', 'maxcart-utilities'), false, true );
+			wp_enqueue_script( 'maxcart-filters', '/wp-content/plugins/max-cart/resources/js/maxcart-filters.js', array('jquery', 'maxcart-utilities', 'maxcart-knockout'), false, true );
 
 			wp_register_style('fancy-css', '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css');
 			wp_enqueue_style('fancy-css');
@@ -532,7 +532,12 @@ if (!class_exists('maxCart')) {
 			wp_enqueue_style( 'maxcart-styles' );
 
 			if (get_page_template_slug() === 'templates/cart-tpl.php') {
-				wp_enqueue_script( 'maxcart-cart', '/wp-content/plugins/max-cart/resources/js/maxcart-cart-view.js', array('jquery'), false, true );
+				wp_enqueue_script( 'maxcart-cart', '/wp-content/plugins/max-cart/resources/js/maxcart-cart-view.js', array('jquery', 'maxcart-knockout'), false, true );
+			}
+
+			if (get_page_template_slug() === 'templates/checkout-tpl.php') {
+				wp_enqueue_script( 'maxcart-checkout-google', '//maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places', array('jquery'), false, true );
+				wp_enqueue_script( 'maxcart-checkout', '/wp-content/plugins/max-cart/resources/js/maxcart-checkout.js', array('maxcart-checkout-google', 'maxcart-knockout'), false, true );
 			}
 		}
 

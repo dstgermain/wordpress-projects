@@ -66,10 +66,6 @@ class maxCartQuickCart extends maxCart {
 	public function maxcart_quickcart_session() {
 		$response = array();
 
-		if ( isset( $_SESSION["zipcode"] ) ) {
-			$response['zipcode'] = $_SESSION["zipcode"];
-		}
-
 		if ( isset( $_SESSION["maxcart_cart"] ) ) {
 			$response['items'] = $_SESSION['maxcart_cart'];
 		}
@@ -131,7 +127,6 @@ class maxCartQuickCart extends maxCart {
 
 		$return = array(
 			'items' => $_SESSION["maxcart_cart"],
-			'zipcode' => isset( $_SESSION["zipcode"] ) ? $_SESSION["zipcode"] : ''
 		);
 
 		echo json_encode( $return );
@@ -154,7 +149,6 @@ class maxCartQuickCart extends maxCart {
 
 			$return = array(
 				'items' => $_SESSION["maxcart_cart"],
-				'zipcode' => isset( $_SESSION["zipcode"] ) ? $_SESSION["zipcode"] : ''
 			);
 
 			echo json_encode( $return );
@@ -195,7 +189,6 @@ class maxCartQuickCart extends maxCart {
 
 		$return = array(
 			'items' => $_SESSION["maxcart_cart"],
-			'zipcode' => isset( $_SESSION["zipcode"] ) ? $_SESSION["zipcode"] : ''
 		);
 
 		echo json_encode( $return );

@@ -557,6 +557,7 @@ a[disabled] {
     position: relative;
 
     &.processing {
+        .max-checkout,
         .max-cart-view {
             opacity: .3;
         }
@@ -637,6 +638,10 @@ a[disabled] {
                     .shipping-estimate-value {
                         display: inline-block;
                         margin-left: 10px;
+                    }
+                    .bg-danger.text-danger {
+                        padding: 10px;
+                        margin: 15px 0;
                     }
                 }
             }

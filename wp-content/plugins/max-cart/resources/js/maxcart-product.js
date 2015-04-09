@@ -1,4 +1,4 @@
-/* global ko, console */
+/* global ko, console, localStorage, maxcart */
 
 /**
  * Product associated functions.
@@ -14,7 +14,26 @@
         self.processing = ko.observable(false);
         self.items_total = ko.observable(0);
         self.zipcode = ko.observable('');
+        self.shipping_error = ko.observable(false);
         self.shipping_rate = ko.observable('');
+        self.shipping_weight = ko.observable('');
+        self.cart_total = ko.computed(function () {
+            var item_total = self.items_total(),
+                shipping_total = self.shipping_rate();
+
+            if (item_total) {
+                item_total = item_total.replace(/\$/g, '');
+            } else {
+                item_total = 0;
+            }
+            if (shipping_total) {
+                shipping_total = shipping_total.replace(/\$/g, '');
+            } else {
+                shipping_total = 0;
+            }
+            console.log(item_total);
+            return  parseFloat(shipping_total) + parseFloat(item_total);
+        });
         self.hide_cart = ko.computed(function () {
             return self.items().length;
         });
@@ -77,7 +96,10 @@
                     }
                 }
 
-                self.zipcode(json.zipcode);
+                if (maxcart.localStorageSupport()) {
+                    self.zipcode(localStorage.getItem('zipcode'));
+                }
+
                 self.items(json.items);
                 self.item_count(count);
                 self._gettotal();
@@ -124,6 +146,8 @@
                 qty = $self.val();
 
             self.processing(true);
+            self.shipping_error(false);
+            self.shipping_rate('');
 
             $.ajax({
                 url: '/wp-admin/admin-ajax.php',

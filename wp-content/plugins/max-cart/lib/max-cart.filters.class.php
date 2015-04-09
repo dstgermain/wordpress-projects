@@ -5,6 +5,7 @@
  * Date: 3/28/15
  * Time: 11:51 AM
  */
+
 if ( ! class_exists( 'maxCartFilters' ) ) {
 	class maxCartFilters extends maxCart {
 		private $categories = array();
@@ -51,7 +52,7 @@ if ( ! class_exists( 'maxCartFilters' ) ) {
 
 			$company_query = new WP_Query( $args );
 
-			if ($company_query->have_posts()) {
+			if ( $company_query->have_posts() ) {
 				foreach ( $company_query->posts as $company ) {
 					$this->companies[] = array(
 						'id'   => $company->ID,
@@ -67,56 +68,71 @@ if ( ! class_exists( 'maxCartFilters' ) ) {
 
 		private function set_prices() {
 			$args = array(
-				'post_type' => parent::MAX_CART_PRODUCT,
-				'orderby'   => 'meta_value_num',
-				'meta_key'  => parent::P_PRICE_KEY,
-				'order'     => 'DESC',
+				'post_type'      => parent::MAX_CART_PRODUCT,
+				'orderby'        => 'meta_value_num',
+				'meta_key'       => parent::P_PRICE_KEY,
+				'order'          => 'DESC',
 				'posts_per_page' => 1
 			);
 
-			$query_high = new WP_Query($args);
+			$query_high = new WP_Query( $args );
 
-			if ($query_high->have_posts()) {
+			if ( $query_high->have_posts() ) {
 				$price_high = get_post_meta( $query_high->post->ID, parent::P_PRICE_KEY, true );
 
-				for ($low = 0; $low < $price_high; $low += 25) {
+				for ( $low = 0; $low < $price_high; $low += 25 ) {
 					$high = $low + 24;
-					array_push($this->prices, $low . '-' . $high);
+					array_push( $this->prices, $low . '-' . $high );
 				}
 			}
 		}
 
-		public function print_filters() { ?>
-			<div class="max-filters">
-				<?php foreach ( $this->filters as $key => $filter ) : ?>
-					<div class="max-filter">
-						<h5 class="max-filter-title"><?php echo $key; ?></h5>
-						<ul class="max-filters">
-							<?php foreach ( $filter as $item ) : ?>
-								<li class="js-add-children_<?php echo $item['id']; ?>">
-									<input type="checkbox" class="hidden max-checkbox-input" data-type="<?php echo $key; ?>" value="<?php echo $item['id']; ?>"/>
-									<label class="js-max-checkbox max-checkbox"><?php echo $item['name']; ?></label>
-								</li>
-							<?php endforeach; ?>
-						</ul>
+		public function print_filters() {
+			if ( is_post_type_archive( parent::MAX_CART_PRODUCT ) ) :
+				?>
+				<form role="search" method="get" class="search-form form-inline"
+				      action="http://www.dev.wordpressproject.com/">
+					<label class="sr-only">Search for:</label>
+
+					<div class="input-group">
+						<input type="search" value="" name="s" class="search-field form-control" placeholder="Search Exeter Dental" required="">
+						<span class="input-group-btn">
+                              <button type="submit" class="search-submit btn btn-default">Search</button>
+						</span>
 					</div>
-				<?php endforeach; ?>
-				<?php if (count($this->prices) > 1) :?>
-					<div class="max-filter">
-						<h5 class="max-filter-title">Price</h5>
-						<span class="max-current-filter"></span>
-						<ul class="max-filters">
-							<?php foreach ( $this->prices as $item ) : ?>
-								<li>
-									<input type="checkbox" class="hidden max-checkbox-input" data-type="price" value="<?php echo $item; ?>"/>
-									<label class="js-max-checkbox max-checkbox"><?php echo $item; ?></label>
-								</li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-				<?php endif; ?>
-			</div>
-		<?php
+				</form>
+				<div class="max-filters">
+					<?php foreach ( $this->filters as $key => $filter ) : ?>
+						<div class="max-filter">
+							<h5 class="max-filter-title"><?php echo $key; ?></h5>
+							<ul class="max-filters">
+								<?php foreach ( $filter as $item ) : ?>
+									<li class="js-add-children_<?php echo $item['id']; ?>">
+										<input type="checkbox" class="hidden max-checkbox-input"
+										       data-type="<?php echo $key; ?>" value="<?php echo $item['id']; ?>"/>
+										<label class="js-max-checkbox max-checkbox"><?php echo $item['name']; ?></label>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endforeach; ?>
+					<?php if ( count( $this->prices ) > 1 ) : ?>
+						<div class="max-filter">
+							<h5 class="max-filter-title">Price</h5>
+							<span class="max-current-filter"></span>
+							<ul class="max-filters">
+								<?php foreach ( $this->prices as $item ) : ?>
+									<li>
+										<input type="checkbox" class="hidden max-checkbox-input" data-type="price"
+										       value="<?php echo $item; ?>"/>
+										<label class="js-max-checkbox max-checkbox"><?php echo $item; ?></label>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endif; ?>
+				</div>
+			<?php endif;
 		}
 	}
 }

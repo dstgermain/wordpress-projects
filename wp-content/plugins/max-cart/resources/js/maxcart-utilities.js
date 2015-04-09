@@ -10,6 +10,14 @@ var maxcart = {};
         $('.loading').remove();
     };
 
+    maxcart.localStorageSupport = function supports_html5_storage() {
+        try {
+            return 'localStorage' in window && window.localStorage !== null;
+        } catch (e) {
+            return false;
+        }
+    };
+
     maxcart.max_fancy_select = function ($self) {
         var options = $self.find('option'),
             selected = $self.find('option:selected'),
@@ -84,7 +92,7 @@ var maxcart = {};
             },
             load_more = $('.js-max-load-more');
 
-        $('.max-product-wrapper').find('select, input').each(function () {
+        $('.max-filters').find('select, input').each(function () {
             var $self = $(this),
                 type = $self.data('type'),
                 input_type = $self.attr('type'),
