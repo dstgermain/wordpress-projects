@@ -1,4 +1,4 @@
-/* global google, console, maxcart */
+/* global google, console, maxcart, jQuery */
 (function maxcartCheckout($) {
     'use strict';
 
@@ -40,17 +40,17 @@
 
         var validation = function validation() {
             var form_obj = {},
-                $form;
+                $form = $('.js-form-validation');
 
             window.ko_maxcart.processing(true);
 
             valid = true;
 
-            $('.js-form-validation').find('input, textarea').each(function () {
-                $form = $(this);
+            $form.find('input, textarea').each(function () {
+                var $input = $(this);
 
-                var val = $form.val(),
-                    id = $form.attr('id'),
+                var val = $input.val(),
+                    id = $input.attr('id'),
                     email = true,
                     number = true;
 
@@ -62,14 +62,44 @@
 
                 if (val && email && number) {
                     form_obj[id] = val;
-                } else if ($form.attr('required')) {
-                    $form.closest('.form-group').addClass('has-error');
+                } else if ($input.attr('required')) {
+                    $input.closest('.form-group').addClass('has-error');
                     valid = false;
                 }
             });
 
             if (valid) {
-                $('.js-form-validation').submit();
+                var $disabled = $form.find(':input:disabled').removeAttr('disabled'),
+                    serialized = $form.serialize();
+
+                $disabled.attr('disabled','disabled');
+
+                $.ajax({
+                    url: '/wp-admin/admin-ajax.php',
+                    type: 'POST',
+                    data: {
+                        action: 'maxcart_checkout_process',
+                        form: serialized,
+                        _wpnonce: $('#verify_maxcart').val()
+                    }
+                }).success(function (data) {
+                    var json = {};
+
+                    try {
+                        json = JSON.parse(data);
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+                    if (!json.error && json.order_id) {
+                        $('#cancel_return').val(window.location.origin + '/cart?cancel_order=' + json.order_id);
+                        $('#custom').val(json.order_id).closest('.js-form-validation').submit();
+                    } else {
+                        window.ko_maxcart.error(true);
+                        window.ko_maxcart.error_message(json.error_message);
+                        window.ko_maxcart.processing(false);
+                    }
+                });
             } else {
                 window.ko_maxcart.processing(false);
                 show_error();
@@ -144,7 +174,7 @@
                 localStorage.setItem('zipcode', val);
                 window.ko_maxcart.zipcode(localStorage.getItem('zipcode'));
             }
-            console.log(val);
+
             if (val) {
                 window.ko_maxcart.processing(true);
                 $.ajax({
@@ -178,6 +208,13 @@
 
     $(function maxcartCheckoutReady() {
         maxcart_checkout.init();
+
+        if (maxcart.localStorageSupport()) {
+            if (localStorage.getItem('zipcode')) {
+                window.ko_maxcart.zipcode(localStorage.getItem('zipcode'));
+                maxcart_checkout.get_shipping($('#zip'));
+            }
+        }
 
         $('#address1').on('focus', function () {
             maxcart_checkout.geolocate();

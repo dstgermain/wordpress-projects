@@ -17,26 +17,39 @@
         self.shipping_error = ko.observable(false);
         self.shipping_rate = ko.observable('');
         self.shipping_weight = ko.observable('');
+        self.error = ko.observable(false);
+        self.error_message = ko.observable('');
         self.cart_total = ko.computed(function () {
             var item_total = self.items_total(),
                 shipping_total = self.shipping_rate();
 
-            if (item_total) {
-                item_total = item_total.replace(/\$/g, '');
-            } else {
+            if (!item_total) {
                 item_total = 0;
             }
+
             if (shipping_total) {
                 shipping_total = shipping_total.replace(/\$/g, '');
             } else {
                 shipping_total = 0;
             }
-            console.log(item_total);
+
             return  parseFloat(shipping_total) + parseFloat(item_total);
         });
         self.hide_cart = ko.computed(function () {
             return self.items().length;
         });
+
+        self.parse_json = function (data) {
+            var json = {};
+
+            try {
+                json = JSON.parse(data);
+            } catch (e) {
+                console.log(e + ' : Error parsing json');
+            }
+
+            return json;
+        };
 
         self._add = function addProduct() {
             var post_id = $('#product-id').val(),
@@ -44,6 +57,7 @@
                 price = $('#product-price').val(),
                 qty = $('#product-qty').val(),
                 url = $('#product-url').val(),
+                sku = $('#product-sku').val(),
                 thumbnail = $('#product-thumbnail').val();
 
             self.processing(true);
@@ -58,41 +72,46 @@
                     product_name: name,
                     product_price: price,
                     product_url: url,
+                    product_sku: sku,
                     product_thumbnail: thumbnail,
                     _wpnonce: $('#verify_product_add_to_cart').val(),
                     _wp_http_referer: $('[name=_wp_http_referer]').val()
                 }
             }).success(function (data) {
-                self._create(data);
-                var $quick_cart = $('.maxcart-quickcart'),
-                    $quick_cart_table = $('.maxcart-quickcart-table');
+                var json = self.parse_json(data);
 
-                $quick_cart.addClass('active');
-                $quick_cart_table.slideDown(function () {
+                if (!json.error_message) {
+                    self._create(json);
+                    var $quick_cart = $('.maxcart-quickcart'),
+                        $quick_cart_table = $('.maxcart-quickcart-table');
+
+                    $quick_cart.addClass('active');
+                    $quick_cart_table.slideDown(function () {
+                        setTimeout(function () {
+                            $quick_cart_table.slideUp(function () {
+                                $quick_cart_table.removeAttr('style');
+                                $quick_cart.removeClass('active');
+                            });
+                        }, 5000);
+                    });
+                } else {
+                    self.error(true);
+                    self.error_message(json.error_message);
+
                     setTimeout(function () {
-                        $quick_cart_table.slideUp(function () {
-                            $quick_cart_table.removeAttr('style');
-                            $quick_cart.removeClass('active');
-                        });
-                    }, 4000);
-                });
+                        self.error(false);
+                    }, 10000);
+                }
                 self.processing(false);
             });
         };
         self._create = function createCart(data) {
-            var json = null,
-                count = 0;
+            var count = 0;
 
-            try {
-                json = JSON.parse(data);
-            } catch (e) {
-                console.log(e + ' : Error parsing json');
-            }
-
-            if (json && json.items) {
-                for (var i = 0; i < json.items.length; i++) {
-                    if (json.items[i].qty) {
-                        count = count + parseInt(json.items[i].qty, 10);
+            if (data && data.items) {
+                for (var i = 0; i < data.items.length; i++) {
+                    if (data.items[i].qty) {
+                        count = count + parseInt(data.items[i].qty, 10);
                     }
                 }
 
@@ -100,9 +119,15 @@
                     self.zipcode(localStorage.getItem('zipcode'));
                 }
 
-                self.items(json.items);
+                var total_weight = 0;
+                for (var j = 0; j < data.items.length; j++) {
+                    total_weight += parseFloat(data.items[j].weight);
+                }
+
+                self.shipping_weight(total_weight);
+                self.items(data.items);
                 self.item_count(count);
-                self._gettotal();
+                self.items_total(data.items_total);
             }
         };
         self._remove = function removeProduct(id) {
@@ -115,28 +140,15 @@
                     product_id: this.id
                 }
             }).success(function (data) {
-                self._create(data);
+                self._create(self.parse_json(data));
                 self.processing(false);
             });
         };
-        self._gettotal = function getTotal() {
-            var self = this,
-                total = 0;
-            if (self.item_count) {
-                for (var i = 0; i < self.items().length; i++) {
-                    for (var j = 0; j < self.items()[i].qty; j++) {
-                        total = total + parseFloat(self.items()[i].price);
-                    }
-                }
 
-                self.items_total('$' + total.toFixed(2));
-            }
-        };
-
-        self._getcart = function addProduct() {
+        self._getcart = function getCart() {
             self.processing(true);
             $.post('/wp-admin/admin-ajax.php', {action: 'maxcart_quickcart_session'}, function (data) {
-                self._create(data);
+                self._create(self.parse_json(data));
                 self.processing(false);
             });
         };
@@ -159,7 +171,16 @@
                     _wpnonce: $('#verify_maxcart').val()
                 }
             }).success(function (data) {
-                self._create(data);
+                var json = self.parse_json(data);
+                if (json.error_message) {
+                    self.error(true);
+                    self.error_message(json.error_message);
+
+                    setTimeout(function () {
+                        self.error(false);
+                    }, 10000);
+                }
+                self._create(json);
                 self.processing(false);
             });
         };
@@ -173,6 +194,14 @@
                     return '$' + value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
                 }
             });
+        }
+    };
+
+    ko.bindingHandlers.fadeVisible = {
+        update: function(element, valueAccessor) {
+            // Whenever the value subsequently changes, slowly fade the element in or out
+            var value = valueAccessor();
+            ko.unwrap(value) ? $(element).slideDown() : $(element).slideUp();
         }
     };
 

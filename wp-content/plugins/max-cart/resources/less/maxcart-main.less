@@ -585,6 +585,13 @@ a[disabled] {
         opacity: 1;
         transition: all .3s ease;
 
+        tr.error-message-row {
+            td {
+                height: auto;
+                padding: 0;
+            }
+        }
+
         td {
             vertical-align: middle !important;
             height: 110px;
@@ -646,6 +653,15 @@ a[disabled] {
                 }
             }
         }
+    }
+}
+
+.error-message {
+    display: none;
+
+    .bg-danger {
+        padding: 5px;
+        min-height: 1em;
     }
 }
 

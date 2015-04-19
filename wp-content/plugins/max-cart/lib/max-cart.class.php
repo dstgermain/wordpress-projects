@@ -357,7 +357,7 @@ if (!class_exists('maxCart')) {
 				'rewrite'           => false,
 			);
 
-			register_taxonomy( self::MAX_CART_VARIATION, array( self::MAX_CART_PRODUCT ), $args );
+			//register_taxonomy( self::MAX_CART_VARIATION, array( self::MAX_CART_PRODUCT ), $args );
 		}
 
 		/**
@@ -389,7 +389,7 @@ if (!class_exists('maxCart')) {
 				'public'             => false,
 				'publicly_queryable' => true,
 				'show_ui'            => true,
-				'show_in_menu'       => 'edit.php?post_type=maxcart_product',
+				'show_in_menu'       => false,
 				'query_var'          => true,
 				'rewrite'            => array( 'slug' => 'order-history' ),
 				'capability_type'    => 'post',

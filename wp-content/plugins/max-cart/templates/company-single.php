@@ -3,7 +3,7 @@ $maxCartCompany = new maxCartCompany();
 the_post();
 ?>
 
-<div class="max-product-wrapper col-sm-12">
+<div class="max-product-wrapper col-sm-10 col-sm-offset-1">
 	<ul class="max-product-breadcrumbs list-inline"><?php echo $maxCartCompany->breadcrumbs; ?></ul>
 	<div class="row margin-bottom_60">
 		<?php if (has_post_thumbnail( $maxCartCompany->company_id ) ): ?>
@@ -20,7 +20,7 @@ the_post();
 	<hr/>
 	<?php if ( $maxCartCompany->company_products->have_posts() ) : ?>
 	<div class="row">
-		<div class="col-sm-12">
+		<div class="col-sm-10 col-sm-offset-1">
 			<div class="margin-bottom_15 pull-right">
 				<?php wp_nonce_field( 'maxcart_ajax', 'verify_maxcart_ajax' ); ?>
 				<input type="hidden" data-type="company" value="<?php echo $maxCartCompany->company_id; ?>"/>

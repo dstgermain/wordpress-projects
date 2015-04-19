@@ -2,10 +2,22 @@
  * Created by dstgermain on 4/4/15.
  */
 
-/* global console, maxcart */
+/* global console, maxcart, jQuery */
 
 (function maxcartCart($) {
+    'use strict';
+
     $(function maxcartCartReady() {
+        $(document).on('click', '.js-paypal-express', function() {
+            window.ko_maxcart.processing(true);
+
+            if (!window.ko_maxcart.shipping_rate()) {
+                window.ko_maxcart.processing(false);
+                window.ko_maxcart.shipping_error(true);
+            } else {
+                $(this).prev().val(window.ko_maxcart.shipping_rate()).closest('form').submit();
+            }
+        });
         $(document).on('click', '.js-shipping-estimate', function () {
             var val = $(this).prev().val();
             if (maxcart.localStorageSupport()) {

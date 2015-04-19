@@ -1,1 +1,65 @@
-.banner { }
+.banner {
+    background: transparent;
+    border: 0;
+
+    .navbar-brand {
+        background: url('/wp-content/themes/roots-master/assets/img/logo1.png') no-repeat;
+        background-size: cover;
+        width: 175px;
+        height: 75px;
+        margin-top: 15px;
+        margin-left: 15px !important;
+        
+        @media (min-width: 768px) {
+            width: 316px;
+            height: 140px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .navbar-nav {
+            clear: left;
+            width: 100%;
+            text-align: center;
+            background-color: @brand-primary;
+            margin-top: 15px;
+            border-radius: 3px;
+
+            & > li {
+                display: inline-block;
+                float: none;
+
+                &:last-of-type > a {
+                    border-right: 1px solid darken(@brand-primary, 10%);
+                }
+
+                &.active > a {
+                    background: darken(@brand-primary, 10%);
+                    color: #fff;
+                    cursor: default;
+                    pointer-events: none;
+
+                    &:hover {
+                        background: darken(@brand-primary, 10%);
+                        color: #fff;
+                    }
+                }
+
+                & > a {
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                    margin-right: -4px;
+                    color: #fff;
+                    background: @brand-primary;
+                    transition: background .2s ease;
+                    border-left: 1px solid darken(@brand-primary, 10%);
+
+                    &:hover {
+                        background: darken(@brand-primary, 10%);
+                        color: #fff;
+                    }
+                }
+            }
+        }
+    }
+}

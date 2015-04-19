@@ -9,11 +9,10 @@
 the_post();
 $maxCartProduct = new maxCartProduct();
 ?>
-
 <div class="max-product-wrapper col-sm-12">
 	<ul class="max-product-breadcrumbs list-inline"><?php echo $maxCartProduct->product_categories; ?></ul>
 	<div class="row">
-		<div class="col-sm-7">
+		<div class="col-sm-5 col-sm-offset-1">
 			<div class="max-product-main">
 				<?php if ( isset( $maxCartProduct->product_gallery_sizes[0] ) && !empty($maxCartProduct->product_gallery_sizes[0]['full']) ) : ?>
 
@@ -57,7 +56,7 @@ $maxCartProduct = new maxCartProduct();
 			<!-- end product-images -->
 		</div>
 
-		<div class="max-product-info col-sm-5">
+		<div class="max-product-info col-sm-4">
 			<h1><?php echo get_the_title(); ?></h1>
 
 			<?php if ($maxCartProduct->product_company && isset( $maxCartProduct->product_company->post_title ) ) : ?>
@@ -74,6 +73,7 @@ $maxCartProduct = new maxCartProduct();
 					</small>
 				<?php endif; ?>
 			</h4>
+			<?php if ($maxCartProduct->product_stock !== 0) : ?>
 			<div class="max-select-group">
 				<label for="product-qty">QTY</label>
 				<select name="" id="product-qty" class="js-max-select hidden">
@@ -94,19 +94,26 @@ $maxCartProduct = new maxCartProduct();
 
 				</select>
 			</div>
-			<input type="hidden" id="product-id" value="<?php echo $maxCartProduct->product_id;?>"/>
-			<input type="hidden" id="product-url" value="<?php echo $maxCartProduct->product_url;?>"/>
-			<input type="hidden" id="product-name" value="<?php echo get_the_title();?>"/>
-			<input type="hidden" id="product-price" value="<?php echo $maxCartProduct->product_price;?>"/>
-			<input type="hidden" id="product-thumbnail" value="<?php echo $maxCartProduct->product_gallery_sizes[0] ? $maxCartProduct->product_gallery_sizes[0]['thumbnail'][0] : '';?>"/>
-			<button class="js-max-product-add max-product-btn max-success" data-bind="click: _add, attr:{disabled: processing}"><span class="fa fa-spinner fa-spin"></span>add to cart</button>
-			<?php wp_nonce_field( 'add_product_to_cart', 'verify_product_add_to_cart' ); ?>
+				<input type="hidden" id="product-id" value="<?php echo $maxCartProduct->product_id;?>"/>
+				<input type="hidden" id="product-url" value="<?php echo $maxCartProduct->product_url;?>"/>
+				<input type="hidden" id="product-name" value="<?php echo get_the_title();?>"/>
+				<input type="hidden" id="product-price" value="<?php echo $maxCartProduct->product_price;?>"/>
+				<input type="hidden" id="product-sku" value="<?php echo $maxCartProduct->product_sku;?>"/>
+				<input type="hidden" id="product-thumbnail" value="<?php echo $maxCartProduct->product_gallery_sizes[0] ? $maxCartProduct->product_gallery_sizes[0]['thumbnail'][0] : '';?>"/>
+				<button class="js-max-product-add max-product-btn max-success" data-bind="click: _add, attr:{disabled: processing}"><span class="fa fa-spinner fa-spin"></span>add to cart</button>
+				<div data-bind="fadeVisible: error" class="error-message">
+					<div class="text-danger bg-danger" data-bind="text: error_message"></div>
+				</div>
+				<?php wp_nonce_field( 'add_product_to_cart', 'verify_product_add_to_cart' ); ?>
+			<?php else : ?>
+				<span class="text-danger"> Out of Stock.</span>
+			<?php endif; ?>
 		</div><!--	end product-info-->
 
 	</div><!-- end product-wrapper -->
 </div>
 
-<div class="max-product-wrapper col-sm-12">
+<div class="max-product-wrapper col-sm-10 col-sm-offset-1">
 	<div class="max-product-description">
 		<?php the_content(); ?>
 	</div><!-- end product-description -->

@@ -22,6 +22,9 @@
 				<br/>
 			<?php endif; ?>
 			<strong>$<?php echo $maxCartProduct->product_price; ?></strong>
+			<?php if ($maxCartProduct->product_stock === 0) : ?>
+				<small class="text-danger">(Out of Stock)</small>
+			<?php endif; ?>
 		</div>
 	</div>
 </div>

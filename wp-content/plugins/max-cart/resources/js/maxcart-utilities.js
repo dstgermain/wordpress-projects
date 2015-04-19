@@ -110,8 +110,6 @@ var maxcart = {};
             }
         });
 
-        console.log(request);
-
         $.ajax({
             url: '/wp-admin/admin-ajax.php',
             type: 'POST',

@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 /**
  * Created by PhpStorm.
@@ -49,12 +48,12 @@ class maxCartQuickCart extends maxCart {
 								</td>
 							</tr>
 						</table>
-						<table class="maxcart-quickcart-list text-right">
+						<table class="maxcart-quickcart-list text-right margin-bottom_15">
 							<tr>
-								<td>Total: <strong data-bind="text: items_total"></strong></td>
+								<td>Total: <strong data-bind="currency: items_total"></strong></td>
 							</tr>
 						</table>
-
+						<p><small>Items are up for grabs until checkout.</small></p>
 						<a href="/cart" class="btn btn-success checkout-button">Checkout</a>
 					</div>
 				</div>
@@ -67,7 +66,11 @@ class maxCartQuickCart extends maxCart {
 		$response = array();
 
 		if ( isset( $_SESSION["maxcart_cart"] ) ) {
-			$response['items'] = $_SESSION['maxcart_cart'];
+			if ( isset( $_SESSION["maxcart_cart"]['error_message'] ) ) {
+				unset( $_SESSION["maxcart_cart"]['error_message'] );
+			}
+
+			$response = $_SESSION['maxcart_cart'];
 		}
 
 		echo json_encode( $response );
@@ -99,37 +102,62 @@ class maxCartQuickCart extends maxCart {
 			'name'       => $_POST['product_name'],
 			'price'      => $_POST['product_price'],
 			'url'        => $_POST['product_url'],
+			'sku'        => $_POST['product_sku'],
 			'item_total' => floatval( $_POST['product_qty'] ) * floatval( $_POST['product_price'] ),
-			'thumbnail'  => isset( $_POST['product_thumbnail'] ) ? $_POST['product_thumbnail'] : ''
+			'thumbnail'  => isset( $_POST['product_thumbnail'] ) ? $_POST['product_thumbnail'] : '',
+			'weight'     => get_post_meta($_POST['product_id'], maxCart::P_WEIGHT_KEY, true)
 		);
+
 		$product_exists = false;
+		$items_total = 0;
+		$shipping_total = isset($_SESSION["maxcart_cart"]) && isset($_SESSION["maxcart_cart"]["shipping_total"]) ? $_SESSION["maxcart_cart"]["shipping_total"] : 0;
+		$product_stock = get_post_meta( intval( $_POST['product_id'] ), maxCart::P_STOCK_KEY, true );
 
 		if ( isset( $_SESSION["maxcart_cart"] ) ) {
 			$current_products = array();
 
-			foreach ( $_SESSION["maxcart_cart"] as $product ) {
+			foreach ( $_SESSION["maxcart_cart"]["items"] as $product ) {
 				if ( $product['id'] === $_POST['product_id'] ) {
 					$product['qty'] = $product['qty'] + $_POST['product_qty'];
+					$product['item_total'] = floatval( $product['qty'] ) * floatval( $_POST['product_price'] );
 					$product_exists = true;
+
+					if ($product_stock && $product['qty'] > $product_stock) {
+						$_SESSION["maxcart_cart"]['error_message'] = 'We currently only have '. $product_stock . ' in stock.';
+						echo json_encode($_SESSION["maxcart_cart"]);
+						die();
+					}
 				}
+
+				$items_total = $items_total + $product['item_total'];
 
 				$current_products[] = $product;
 			}
 
 			if ( ! $product_exists ) {
+				if (($product_stock || $product_stock === '0') && ($_POST['product_qty'] > $product_stock)) {
+					$_SESSION["maxcart_cart"]['error_message'] = 'We currently only have '. $product_stock . ' in stock.';
+					echo json_encode($_SESSION["maxcart_cart"]);
+					die();
+				}
 				$current_products[] = $new_product;
+				$items_total = $items_total + $new_product['item_total'];
 			}
 
-			$_SESSION["maxcart_cart"] = $current_products;
+			$_SESSION["maxcart_cart"] = array(
+				'items' => $current_products,
+				'items_total' => $items_total,
+				'shipping_total' => $shipping_total
+			);
 		} else {
-			$_SESSION["maxcart_cart"] = array( $new_product );
+			$_SESSION["maxcart_cart"] = array(
+				'items' => array($new_product),
+				'items_total' => $new_product['item_total'],
+				'shipping_total' => $shipping_total
+			);
 		}
 
-		$return = array(
-			'items' => $_SESSION["maxcart_cart"],
-		);
-
-		echo json_encode( $return );
+		echo json_encode( $_SESSION["maxcart_cart"] );
 
 		die();
 	}
@@ -138,20 +166,33 @@ class maxCartQuickCart extends maxCart {
 		if ( isset( $_SESSION["maxcart_cart"] ) && isset( $_POST['product_id'] ) ) {
 			$id          = $_POST['product_id'];
 			$new_session = [ ];
+			$items_total = 0;
 
-			foreach ( $_SESSION["maxcart_cart"] as $product ) {
+			$shipping_total = isset($_SESSION["maxcart_cart"]) && isset($_SESSION["maxcart_cart"]["shipping_total"]) ? $_SESSION["maxcart_cart"]["shipping_total"] : 0;
+
+			foreach ( $_SESSION["maxcart_cart"]["items"] as $product ) {
 				if ( $product['id'] !== $id ) {
 					array_push( $new_session, $product );
+				} else {
+					$items_total = $items_total + $product['item_total'];
 				}
 			}
 
-			$_SESSION["maxcart_cart"] = $new_session;
+			if ( count( $new_session ) > 0 ) {
+				$_SESSION["maxcart_cart"] = array(
+					'items' => $new_session,
+					'items_total' => $items_total,
+					'shipping_total' => $shipping_total
+				);
+			} else {
+				$_SESSION["maxcart_cart"] = array(
+					'items' => array(),
+					'items_total' => 0.00,
+					'shipping_total' => $shipping_total
+				);
+			}
 
-			$return = array(
-				'items' => $_SESSION["maxcart_cart"],
-			);
-
-			echo json_encode( $return );
+			echo json_encode( $_SESSION["maxcart_cart"] );
 		}
 		die();
 	}
@@ -169,13 +210,23 @@ class maxCartQuickCart extends maxCart {
 			return false;
 		}
 
-		$current_cart = $_SESSION["maxcart_cart"];
+		$current_cart = $_SESSION["maxcart_cart"]['items'];
 		$updated_cart = array();
+		$items_total = 0;
+		$product_stock = get_post_meta( intval( $_POST['product_id'] ), maxCart::P_STOCK_KEY, true );
+
+		$shipping_total = isset($_SESSION["maxcart_cart"]) && isset($_SESSION["maxcart_cart"]["shipping_total"]) ? $_SESSION["maxcart_cart"]["shipping_total"] : 0;
 
 		foreach ( $current_cart as $product ) {
 			if ( $product['id'] === $_POST['product_id'] ) {
 				$product['qty']        = $_POST['product_qty'];
 				$product['item_total'] = floatval( $product['price'] ) * floatval( $product['qty'] );
+
+				if ($product_stock && $product['qty'] > $product_stock) {
+					$_SESSION["maxcart_cart"]['error_message'] = 'We currently only have '. $product_stock . ' "' . $product['name'] . '" in stock.';
+					echo json_encode($_SESSION["maxcart_cart"]);
+					die();
+				}
 
 				if ( $product['qty'] !== '0' ) {
 					array_push( $updated_cart, $product );
@@ -183,15 +234,17 @@ class maxCartQuickCart extends maxCart {
 			} else {
 				array_push( $updated_cart, $product );
 			}
+
+			$items_total = $items_total + $product['item_total'];
 		}
 
-		$_SESSION["maxcart_cart"] = $updated_cart;
-
-		$return = array(
-			'items' => $_SESSION["maxcart_cart"],
+		$_SESSION["maxcart_cart"] = array(
+			'items' => $updated_cart,
+			'items_total' => $items_total,
+			'shipping_total' => $shipping_total
 		);
 
-		echo json_encode( $return );
+		echo json_encode( $_SESSION["maxcart_cart"] );
 		die();
 	}
 }

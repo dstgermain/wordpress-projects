@@ -173,10 +173,10 @@ class maxCartProductAdmin extends maxCart {
 	 * @author Daniel St. Germain
 	 */
 	public function add_product_main_metaboxes() {
-		add_meta_box( 'product-variation', 'Variations', array(
-			$this,
-			'display_product_variation_metabox'
-		), parent::MAX_CART_PRODUCT, 'normal', 'core' );
+//		add_meta_box( 'product-variation', 'Variations', array(
+//			$this,
+//			'display_product_variation_metabox'
+//		), parent::MAX_CART_PRODUCT, 'normal', 'core' );
 
 		add_meta_box( 'product-gallery', 'Gallery', array(
 			$this,
@@ -239,28 +239,28 @@ class maxCartProductAdmin extends maxCart {
 		?>
 		<table class="full-width">
 			<tr>
-				<td colspan="2"><p><strong><?php echo __( 'Shipping based on weight and/or dimensions.', 'max_cart_textdomain' );?></strong></p></td>
+				<td colspan="2"><p><strong><?php echo __( 'Shipping based on weight.', 'max_cart_textdomain' );?></strong></p></td>
 			</tr>
 			<tr>
 				<td style="width:172px;"><label><?php echo __( 'Weight (lbs)', 'max_cart_textdomain' );?></label></td>
 				<td><input type="text" name="productWeight" id="productWeight" value="<?php echo $weight; ?>"/></td>
 			</tr>
+<!--			<tr>-->
+<!--				<td style="width:172px;"><label>--><?php //echo __( 'Dimensions (inches)', 'max_cart_textdomain' );?><!--</label></td>-->
+<!--				<td>-->
+<!--					<input type="text" name="productLength" id="productLength" placeholder="L" class="product-dimension" value="--><?php //echo $length; ?><!--"/>-->
+<!--					<strong> X </strong>-->
+<!--					<input type="text" name="productWidth" id="productWidth" placeholder="W" class="product-dimension" value="--><?php //echo $width; ?><!--"/>-->
+<!--					<strong> X </strong>-->
+<!--					<input type="text" name="productHeight" id="productHeight" placeholder="H" class="product-dimension" value="--><?php //echo $height; ?><!--"/>-->
+<!--				</td>-->
+<!--			</tr>-->
 			<tr>
-				<td style="width:172px;"><label><?php echo __( 'Dimensions (inches)', 'max_cart_textdomain' );?></label></td>
-				<td>
-					<input type="text" name="productLength" id="productLength" placeholder="L" class="product-dimension" value="<?php echo $length; ?>"/>
-					<strong> X </strong>
-					<input type="text" name="productWidth" id="productWidth" placeholder="W" class="product-dimension" value="<?php echo $width; ?>"/>
-					<strong> X </strong>
-					<input type="text" name="productHeight" id="productHeight" placeholder="H" class="product-dimension" value="<?php echo $height; ?>"/>
-				</td>
+<!--				<td colspan="2"><p><strong>--><?php //echo __( 'Flat Rate Shipping.', 'max_cart_textdomain' );?><!--</strong></p></td>-->
 			</tr>
 			<tr>
-				<td colspan="2"><p><strong><?php echo __( 'Flat Rate Shipping.', 'max_cart_textdomain' );?></strong></p></td>
-			</tr>
-			<tr>
-				<td style="width:172px;"><label><?php echo __( 'Flat Rate', 'max_cart_textdomain' );?></label></td>
-				<td><input type="text" name="productFlatRate" id="productFlatRate" value="<?php echo $flatrate; ?>"/></td>
+<!--				<td style="width:172px;"><label>--><?php //echo __( 'Flat Rate', 'max_cart_textdomain' );?><!--</label></td>-->
+<!--				<td><input type="text" name="productFlatRate" id="productFlatRate" value="--><?php //echo $flatrate; ?><!--"/></td>-->
 			</tr>
 		</table>
 	<?php

@@ -13,10 +13,13 @@
  * ===== Copyright 2015 Daniel St. Germain ======
  */
 
+session_start();
+
 require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.class.php' );
 
 function max_cart_setup() {
 	$includes = array(
+		'process-checkout',
 		'cart',
 		'product',
 		'product-archive',
@@ -24,7 +27,9 @@ function max_cart_setup() {
 		'company-archive',
 		'quick-cart',
 		'ajax-filters',
-		'filters'
+		'filters',
+		'checkout',
+		'paypal-ipn'
 	);
 
 	foreach ($includes as $include) {
@@ -36,6 +41,7 @@ add_action('init', 'max_cart_setup');
 
 if (is_admin()) {
 	require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.product-admin.class.php' );
+	require_once( WP_PLUGIN_DIR . '/max-cart/lib/max-cart.order-admin.class.php' );
 }
 
 class customTemplates {
@@ -72,7 +78,8 @@ class customTemplates {
 
 		$this->templates = array(
 			'templates/cart-tpl.php' => 'Cart View',
-			'templates/checkout-tpl.php' => 'Checkout Page'
+			'templates/checkout-tpl.php' => 'Checkout Page',
+			'templates/thankyou.php' => 'Thank You Page'
 		);
 	}
 
@@ -152,5 +159,3 @@ function maxcart_register_widgets() {
 }
 
 add_action( 'widgets_init', 'maxcart_register_widgets' );
-
-

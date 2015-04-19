@@ -1,0 +1,324 @@
+04-13-2015 @ 22:31:12 - Payment IPN Array: Array
+(
+    [findersmc_gross] => 19.95
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => express_checkout
+    [payment_gross] => 19.95
+    [shipping] => 7.67
+)
+
+04-13-2015 @ 22:31:12 - Payment IPN_status: 1
+04-13-2015 @ 22:31:12 - Payment status: Completed
+04-13-2015 @ 22:31:12 - Payment transaction type: express_checkout
+04-13-2015 @ 22:32:22 - Payment IPN Array: Array
+(
+    [findersmc_gross] => 19.95
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => express_checkout
+    [payment_gross] => 19.95
+    [shipping] => 7.67
+)
+
+04-13-2015 @ 22:32:22 - Payment IPN_status: 1
+04-13-2015 @ 22:32:22 - Payment status: Completed
+04-13-2015 @ 22:32:22 - Payment transaction type: express_checkout
+04-13-2015 @ 22:33:26 - Payment IPN Array: Array
+(
+    [findersmc_gross] => 19.95
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => express_checkout
+    [payment_gross] => 19.95
+    [shipping] => 7.67
+)
+
+04-13-2015 @ 22:33:26 - Payment IPN_status: 1
+04-13-2015 @ 22:33:26 - Payment status: Completed
+04-13-2015 @ 22:33:26 - Payment transaction type: express_checkout
+04-13-2015 @ 22:34:53 - Payment IPN Array: Array
+(
+    [findersmc_gross] => 19.95
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => express_checkout
+    [payment_gross] => 19.95
+    [shipping] => 7.67
+)
+
+04-13-2015 @ 22:34:53 - Payment IPN_status: 1
+04-13-2015 @ 22:34:53 - Payment status: Completed
+04-13-2015 @ 22:34:53 - Payment transaction type: express_checkout
+04-13-2015 @ 22:40:49 - Payment IPN Array: Array
+(
+    [findersmc_gross] => 19.95
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => express_checkout
+    [payment_gross] => 19.95
+    [shipping] => 7.67
+)
+
+04-13-2015 @ 22:40:49 - Payment IPN_status: 1
+04-13-2015 @ 22:40:49 - Payment status: Completed
+04-13-2015 @ 22:40:49 - Payment transaction type: express_checkout
+04-13-2015 @ 23:10:41 - Payment IPN Array: Array
+(
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [business] => info@danstgermain.com
+)
+
+04-13-2015 @ 23:10:41 - Payment IPN_status: 1
+04-13-2015 @ 23:10:41 - Payment status: Completed
+04-13-2015 @ 23:10:41 - Payment transaction type: cart
+04-13-2015 @ 23:11:29 - Payment IPN Array: Array
+(
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [business] => info@danstgermain.com
+)
+
+04-13-2015 @ 23:11:29 - Payment IPN_status: 1
+04-13-2015 @ 23:11:29 - Payment status: Completed
+04-13-2015 @ 23:11:29 - Payment transaction type: cart
+04-13-2015 @ 23:13:47 - Payment IPN Array: Array
+(
+    [protection_eligibility] => Eligible
+    [address_status] => confirmed
+    [payer_id] => LPLWNMTBWMFAY
+    [tax] => 0.00
+    [address_street] => 1 Main St
+    [payment_date] => 20%3A12%3A59+Jan+13%2C+2009+PST
+    [payment_status] => Completed
+    [address_zip] => 95131
+    [first_name] => Test
+    [address_country_code] => US
+    [address_name] => Test User
+    [custom] => 61783511
+    [payer_status] => verified
+    [address_country] => United States
+    [address_city] => San Jose
+    [payer_email] => gpmac_1231902590_per@paypal.com
+    [payment_type] => instant
+    [last_name] => User
+    [address_state] => CA
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [business] => info@danstgermain.com
+)
+
+04-13-2015 @ 23:13:47 - Payment IPN_status: 1
+04-13-2015 @ 23:13:47 - Payment status: Completed
+04-13-2015 @ 23:13:47 - Payment transaction type: cart
+04-13-2015 @ 23:21:30 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:21:30 - Payment IPN_status: 1
+04-13-2015 @ 23:21:30 - Payment status: Completed
+04-13-2015 @ 23:21:30 - Payment transaction type: cart
+04-13-2015 @ 23:22:04 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:22:04 - Payment IPN_status: 1
+04-13-2015 @ 23:22:04 - Payment status: Completed
+04-13-2015 @ 23:22:04 - Payment transaction type: cart
+04-13-2015 @ 23:24:04 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:24:04 - Payment IPN_status: 1
+04-13-2015 @ 23:24:04 - Payment status: Completed
+04-13-2015 @ 23:24:04 - Payment transaction type: cart
+04-13-2015 @ 23:24:18 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:24:18 - Payment IPN_status: 1
+04-13-2015 @ 23:24:18 - Payment status: Completed
+04-13-2015 @ 23:24:18 - Payment transaction type: cart
+04-13-2015 @ 23:27:41 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:27:41 - Payment IPN_status: 1
+04-13-2015 @ 23:27:41 - Payment status: Completed
+04-13-2015 @ 23:27:41 - Payment transaction type: cart
+04-13-2015 @ 23:45:50 - Payment IPN Array: Array
+(
+    [custom] => 61783511
+    [txn_type] => cart
+    [payment_gross] => 17.61
+    [mc_handling] => 7.62
+    [payment_status] => Completed
+    [business] => info@danstgermain.com
+    [bn] => AngellEYE_PHPClass
+)
+
+04-13-2015 @ 23:45:50 - Payment IPN_status: 1
+04-13-2015 @ 23:45:50 - Payment status: Completed
+04-13-2015 @ 23:45:50 - Payment transaction type: cart

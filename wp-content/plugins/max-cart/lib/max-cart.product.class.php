@@ -32,7 +32,7 @@ class maxCartProduct extends maxCart {
 		$this->product_url     = $post->guid;
 		$this->product_price   = isset( $meta[parent::P_PRICE_KEY] ) && !empty( $meta[parent::P_PRICE_KEY] ) ? $meta[parent::P_PRICE_KEY][0] : 'free';
 		$this->product_company = isset( $meta[parent::P_COMPANY_KEY] ) && !empty( $meta[parent::P_COMPANY_KEY][0] ) ? get_post($meta[parent::P_COMPANY_KEY][0]) : array();
-		$this->product_stock   = isset( $meta[parent::P_STOCK_KEY] ) && !empty( $meta[parent::P_STOCK_KEY] ) ? intval($meta[parent::P_STOCK_KEY][0]) : false ;
+		$this->product_stock   = isset( $meta[parent::P_STOCK_KEY] ) && !empty( $meta[parent::P_STOCK_KEY] ) && $meta[parent::P_STOCK_KEY][0] !== '' ? intval($meta[parent::P_STOCK_KEY][0]) : false ;
 
 		$this->product_categories = '<li><a href="/products">All Products</a> >&nbsp;</li>' . get_the_term_list($post->ID, parent::MAX_CART_CATEGORY, '<li>', ' >&nbsp;</li><li>', ' >&nbsp;</li>') . '<li>' . $this->product_title . '</li>';
 		$this->product_variations = get_the_term_list($post->ID, parent::MAX_CART_VARIATION, '<li>', ' >&nbsp;</li><li>', '</li>');
