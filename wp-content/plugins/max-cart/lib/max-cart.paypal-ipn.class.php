@@ -5,6 +5,11 @@
  * Date: 4/13/15
  * Time: 6:08 PM
  */
+
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if ( ! class_exists('maxCartPayPalIpn') ) {
 	class maxCartPayPalIpn extends maxCart {
 		public function __construct() {
@@ -13,7 +18,7 @@ if ( ! class_exists('maxCartPayPalIpn') ) {
 
 		public function process_paypal_ipn( $posted ) {
 			if (isset($posted['business']) &&
-			    $posted['business'] === 'info@danstgermain.com' &&
+			    $posted['business'] === get_option('pp_standard_email','false') &&
 			    ( $posted['txn_type'] === 'express_checkout' || $posted['txn_type'] === 'cart' ) ) {
 				if ( isset( $posted['custom'] ) ) {
 					$id = $posted['custom'];

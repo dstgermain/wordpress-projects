@@ -29,6 +29,24 @@ $maxCartProduct = new maxCartProduct();
 						<?php endforeach; ?>
 					</div>
 
+				<?php elseif ( has_post_thumbnail( $maxCartProduct->product_id ) ) : ?>
+
+					<?php $url = wp_get_attachment_url( get_post_thumbnail_id( $maxCartProduct->product_id ) ); ?>
+					<div class="max-product-main-image">
+						<a class="fancybox active"
+						   rel="group"
+						   data-gallery-id="0"
+						   href="<?php echo $url; ?>">
+
+							<?php $attr = array(
+								'class' => "img-responsive",
+								'alt'   => get_the_title(),
+							); ?>
+							<?php the_post_thumbnail( 'large', $attr ); ?>
+
+						</a>
+					</div>
+
 				<?php else : ?>
 					<div class="max-product-main-image missing">
 						<i class="fa fa-question-circle fa-4x"></i>
@@ -62,8 +80,13 @@ $maxCartProduct = new maxCartProduct();
 			<?php if ($maxCartProduct->product_company && isset( $maxCartProduct->product_company->post_title ) ) : ?>
 				<h4>by: <a href="<?php echo $maxCartProduct->product_company->guid; ?>"><?php echo $maxCartProduct->product_company->post_title;?></a></h4>
 			<?php endif; ?>
-
-			<h4 class="max-product-price"><?php echo '$' . $maxCartProduct->product_price; ?>
+			<?php $is_num = $maxCartProduct->product_price === '0'; ?>
+			<h4 class="max-product-price">
+				<?php if ($is_num) : ?>
+					Please Call
+				<?php else: ?>
+					$<?php echo $maxCartProduct->product_price; ?>
+				<?php endif; ?>
 				<?php if ($maxCartProduct->product_stock) : ?>
 					<small class="max-product-stock">
 						in stock
@@ -73,7 +96,8 @@ $maxCartProduct = new maxCartProduct();
 					</small>
 				<?php endif; ?>
 			</h4>
-			<?php if ($maxCartProduct->product_stock !== 0) : ?>
+			<?php $in_store = get_post_meta($post->ID, maxCart::P_INSTORE_KEY, true); ?>
+			<?php if ($maxCartProduct->product_stock !== 0 && $in_store !== 'on') { ?>
 			<div class="max-select-group">
 				<label for="product-qty">QTY</label>
 				<select name="" id="product-qty" class="js-max-select hidden">
@@ -105,9 +129,11 @@ $maxCartProduct = new maxCartProduct();
 					<div class="text-danger bg-danger" data-bind="text: error_message"></div>
 				</div>
 				<?php wp_nonce_field( 'add_product_to_cart', 'verify_product_add_to_cart' ); ?>
-			<?php else : ?>
+			<?php } elseif ($in_store === 'on') { ?>
+				<span class="text-danger"> *Available In Store Only.</span>
+			<?php } else { ?>
 				<span class="text-danger"> Out of Stock.</span>
-			<?php endif; ?>
+			<?php } ?>
 		</div><!--	end product-info-->
 
 	</div><!-- end product-wrapper -->
@@ -116,5 +142,27 @@ $maxCartProduct = new maxCartProduct();
 <div class="max-product-wrapper col-sm-10 col-sm-offset-1">
 	<div class="max-product-description">
 		<?php the_content(); ?>
+		<?php if (get_cfc_meta('product_tabs')) : ?>
+		<div class="row">
+			<div class="col-sm-12">
+				<div role="tabpanel clearfix">
+					<ul class="nav nav-tabs" role="tablist">
+						<?php $first = true; foreach (get_cfc_meta('product_tabs') as $key => $value) : ?>
+							<li role="presentation" <?php echo $first ? 'class="active"' : ''; ?>>
+								<a href="#<?php echo the_cfc_field( 'product_tabs', 'tab-title', false, $key ); ?>" aria-controls="<?php echo the_cfc_field( 'product_tabs', 'tab-title', false, $key ); ?>" role="tab" data-toggle="tab"><?php echo the_cfc_field( 'product_tabs', 'tab-title', false, $key ); ?></a>
+							</li>
+						<?php $first = false; endforeach; ?>
+					</ul>
+					<div class="tab-content clearfix">
+						<?php $first = true; foreach (get_cfc_meta('product_tabs') as $key => $value) : ?>
+							<div role="tabpanel" class="tab-pane <?php echo $first ? 'active' : ''; ?>" id="<?php echo the_cfc_field( 'product_tabs', 'tab-title', false, $key ); ?>">
+								<?php echo the_cfc_field( 'product_tabs', 'tab-info', false, $key ); ?>
+							</div>
+							<?php $first = false; endforeach; ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php endif; ?>
 	</div><!-- end product-description -->
 </div><!-- end product-wrapper -->

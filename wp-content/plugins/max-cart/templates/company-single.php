@@ -20,9 +20,19 @@ the_post();
 	<hr/>
 	<?php if ( $maxCartCompany->company_products->have_posts() ) : ?>
 	<div class="row">
-		<div class="col-sm-10 col-sm-offset-1">
+		<div class="col-sm-12 clearfix max-filters">
 			<div class="margin-bottom_15 pull-right">
 				<?php wp_nonce_field( 'maxcart_ajax', 'verify_maxcart_ajax' ); ?>
+				<div class="margin-right_15 models-inline">
+					<?php if ($maxCartCompany->company_categories && count($maxCartCompany->company_categories)) : ?>
+						<select name="companyModels" id="companyModels" class="js-max-select js-max-models hidden" data-type="company_categories">
+							<option value="0">All Models</option>
+							<?php foreach($maxCartCompany->company_categories as $category) : ?>
+								<option value="<?php echo $category->term_id; ?>"><?php echo $category->name; ?></option>
+							<?php endforeach ?>
+						</select>
+					<?php endif; ?>
+				</div>
 				<input type="hidden" data-type="company" value="<?php echo $maxCartCompany->company_id; ?>"/>
 				<select name="orderBy" id="orderBy" class="js-max-select js-max-orderby hidden" data-type="orderBy">
 					<option value="price:ASC">Price Ascending</option>

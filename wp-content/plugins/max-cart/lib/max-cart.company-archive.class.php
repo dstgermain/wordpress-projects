@@ -6,6 +6,10 @@
  * Time: 8:38 AM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 class maxCartCompanyArchive extends maxCart {
 	public $breadcrumbs = '<li>All Companies</li>';
 	public $companies = null;

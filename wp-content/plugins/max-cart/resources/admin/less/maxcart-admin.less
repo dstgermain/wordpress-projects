@@ -26,3 +26,35 @@
 .product-dimension {
     width: 75px;
 }
+
+ul.orders-pagination {
+    list-style: none;
+
+    li {
+        display: inline-block;
+        margin-right: 5px;
+
+        a {
+            display: block;
+            padding: 2px 0;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            background: #ccc;
+            color: #333;
+            text-decoration: none;
+
+            &:hover {
+                background: #333;
+                color: #ccc;
+            }
+
+        }
+
+        &.active a {
+            background: #333;
+            color: #ccc;
+        }
+    }
+}

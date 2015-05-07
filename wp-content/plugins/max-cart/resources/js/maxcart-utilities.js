@@ -3,11 +3,17 @@
 var maxcart = {};
 
 (function maxCartUtilites($) {
+    'use strict';
+
     maxcart.loading_add = function ($cover) {
-        $cover.append('<div class="loading"><i class="fa fa-spinner fa-pulse fa-2x"></i></div>');
+        $cover.animate({opacity: '.3'}).append('<div class="loader"><i class="fa fa-spinner fa-pulse fa-2x"></i></div>');
     };
     maxcart.loading_remove = function () {
-        $('.loading').remove();
+        var $loader = $('.loader');
+        $loader.parent().animate({opacity: '1'}, 300);
+        $loader.animate({opacity: '0'}, 300, 'swing', function () {
+            $loader.remove();
+        });
     };
 
     maxcart.localStorageSupport = function supports_html5_storage() {
@@ -99,7 +105,7 @@ var maxcart = {};
                 val = $self.val();
 
             if ((input_type === 'checkbox' && $self.attr('checked')) || (input_type !== 'checkbox')) {
-                if (type && ( type === 'category' || type === 'company' ) ) {
+                if (type && ( type === 'category' || type === 'company' || type === 'company_categories' ) ) {
                     if (!request[type]) {
                         request[type] = [];
                     }
@@ -170,6 +176,32 @@ var maxcart = {};
                 $self.trigger( 'max_checked', [ is_checked, $checkbox.val() ] );
             });
         }
+
+        $(document).on('click mouseover touchend', '.maxcart-quickcart-inner', function (e) {
+            var $self = $(this),
+                $quick_cart_table = $('.maxcart-quickcart-table');
+            if ($self.closest('.maxcart-quickcart').hasClass('active') && $self.closest('.maxcart-quickcart').hasClass('clicked') && e.type === 'click') {
+                $quick_cart_table.slideUp('300', function () {
+                    $self.closest('.maxcart-quickcart').removeClass('active').removeClass('clicked');
+                    $quick_cart_table.removeAttr('style');
+                });
+            } else {
+                $self.closest('.maxcart-quickcart').addClass('active');
+                $quick_cart_table.slideDown('300');
+                if (e.type === 'click') {
+                    $self.closest('.maxcart-quickcart').addClass('clicked');
+                }
+            }
+        });
+
+        $(document).on('click', function (e) {
+            if (e.target.className !== 'maxcart-quickcart-table' && e.target.className !== 'maxcart-quickcart-inner') {
+                $('.maxcart-quickcart-table').slideUp('300', function () {
+                    $('.maxcart-quickcart-table').closest('.maxcart-quickcart').removeClass('active').removeClass('clicked');
+                    $('.maxcart-quickcart-table').removeAttr('style');
+                });
+            }
+        });
 
         var $max_endless = $('.js-max-load-more');
         if ($max_endless.length) {

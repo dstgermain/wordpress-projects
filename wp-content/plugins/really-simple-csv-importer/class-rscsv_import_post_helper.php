@@ -242,13 +242,59 @@ class RSCSV_Import_Post_Helper
      * @param (array/string) $taxonomy The context in which to relate the term to the object
      * @param (array/int/string) $terms The slug or id of the term
      */
-    public function setObjectTerms($taxonomy, $terms)
+    public function setObjectTerms($terms)
     {
         $post = $this->getPost();
-        if ($post instanceof WP_Post) {
-            wp_set_object_terms($post->ID, $terms, $taxonomy);
-        } else {
-            $this->addError('post_is_not_set', __('WP_Post object is not set.', 'really-simple-csv-importer'));
+
+        $parts_cats = array('burner',
+            'burner head',
+            'cooking grid',
+            'gaslight part',
+            'heat shielding',
+            'Kings Kooker & hot plate',
+            'repair part',
+            'valve',
+            'venturi',
+            'warming rack'
+        );
+
+        $part = false;
+
+        foreach ($terms as $taxonomy => $value) {
+            if (in_array($value[0], $parts_cats)) {
+                $part = true;
+                $parent_term = get_term_by( 'name', 'parts', 'maxcart_category' );
+                foreach ($value as $val) {
+                    wp_insert_term(
+                        $val, // the term
+                        'maxcart_category', // the taxonomy
+                        array(
+                            'parent'=> $parent_term->term_id
+                        )
+                    );
+                }
+                wp_set_object_terms($post->ID, $value, 'maxcart_category');
+            } else if ($post instanceof WP_Post && $taxonomy === 'subcategory') {
+                $parent_term = get_term_by( 'name', $terms['maxcart_category'][0], 'maxcart_category' );
+                foreach ($value as $val) {
+                    wp_insert_term(
+                        $val, // the term
+                        'maxcart_category', // the taxonomy
+                        array(
+                            'parent'=> $parent_term->term_id
+                        )
+                    );
+                }
+                $all_terms = array_merge($value, $terms['maxcart_category']);
+                if ($part) {
+                    $all_terms = array_merge(array('parts'), $all_terms);
+                }
+                wp_set_object_terms($post->ID, $all_terms, 'maxcart_category');
+            } else if ($post instanceof WP_Post) {
+                wp_set_object_terms($post->ID, $value, $taxonomy);
+            } else {
+                $this->addError('post_is_not_set', __('WP_Post object is not set.', 'really-simple-csv-importer'));
+            }
         }
     }
     
@@ -306,7 +352,10 @@ class RSCSV_Import_Post_Helper
     {
         $post = $this->getPost();
         if ($post instanceof WP_Post) {
-            if ( $file && file_exists($file) ) {
+            if ( $file && (file_exists($file) || file_exists(ABSPATH . $file)) ) {
+                if (!file_exists($file)) {
+                    $file = ABSPATH . $file;
+                }
                 $filename = basename($file);
                 $wp_filetype = wp_check_filetype_and_ext($file, $filename);
                 $ext = empty( $wp_filetype['ext'] ) ? '' : $wp_filetype['ext'];

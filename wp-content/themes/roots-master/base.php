@@ -1,5 +1,6 @@
 <?php get_template_part('templates/head'); ?>
 <body <?php body_class(); ?>>
+<?php if ( !isset( $_GET['process'] ) || ( isset( $_GET['process'] ) && $_GET['process'] !== 'paypal_express' ) ) : ?>
 
   <!--[if lt IE 8]>
     <div class="alert alert-warning">
@@ -28,6 +29,12 @@
   <?php get_template_part('templates/footer'); ?>
 
   <?php wp_footer(); ?>
-
+<?php else : ?>
+    <div class="margin-top_30">
+      <div class="text-center">
+        Loading...
+      </div>
+    </div>
+<?php endif; ?>
 </body>
 </html>

@@ -127,9 +127,7 @@ class RS_CSV_Importer extends WP_Importer {
 		$h->setMeta($meta);
 		
 		// Set terms
-		foreach ($terms as $key => $value) {
-			$h->setObjectTerms($key, $value);
-		}
+		$h->setObjectTerms($terms);
 		
 		// Add thumbnail
 		if ($thumbnail) {
@@ -191,6 +189,22 @@ class RS_CSV_Importer extends WP_Importer {
 						} else {
 							$error->add( 'post_type_check', sprintf(__('The post type value from your csv file does not match the existing data in your database. post_id: %d, post_type(csv): %s, post_type(db): %s', 'really-simple-csv-importer'), $post_id, $post_type, $post_exist->post_type) );
 						}
+					}
+				}
+
+				$product_sku = $h->get_data($this,$data,'_maxcart_product_sku');
+				if ($product_sku) {
+					$posts = get_posts(array(
+						'numberposts'	=> -1,
+						'post_type'		=> $post_type,
+						'meta_key'		=> '_maxcart_product_sku',
+						'meta_value'	=> $product_sku
+					));
+
+					if ($posts) {
+						echo 'UPDATING - SKU: ' . $product_sku . ': ';
+						$post['ID'] = $posts[0]->ID;
+						$is_update = true;
 					}
 				}
 				

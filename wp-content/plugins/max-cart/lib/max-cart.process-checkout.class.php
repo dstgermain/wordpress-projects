@@ -6,6 +6,10 @@
  * Time: 8:08 PM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 class maxCartProcessCheckout extends maxCart {
 	public function generate_random_id() {
 		$num = "0123456789";
@@ -194,30 +198,80 @@ class maxCartProcessCheckout extends maxCart {
 			add_post_meta($order_id, '_maxcart_order_approved', 'Pending');
 		}
 
-		$this->send_confirmation_email(null, 'HEY');
+		$this->send_confirmation_email($form['email'], $order_id);
 
 		return array(
 			'error' => false
 		);
 	}
 
-	public function send_confirmation_email($to, $response) {
-		$to      = 'dst.germain48@gmail.com';
-		$subject = "This is subject";
-		$message = "<b>This is HTML message.</b>";
-		$message .= "<h1>This is headline.</h1>";
-		$header = "From:abc@somedomain.com \r\n";
-		$header .= "Cc:afgh@somedomain.com \r\n";
-		$header .= "MIME-Version: 1.0\r\n";
-		$header .= "Content-type: text/html\r\n";
-		$retval = mail ($to,$subject,$message,$header);
-		if( $retval == true )
-		{
-			echo "Message sent successfully...";
+	public function send_confirmation_email($to, $order_id) {
+		require_once( WP_PLUGIN_DIR . '/max-cart/lib/third_party_lib/PHPMailer-master/PHPMailerAutoload.php' );
+
+		$order_info = get_post($order_id);
+		$order_meta = get_post_meta($order_id);
+
+		$mail = new PHPMailer;
+
+		$mail->isSMTP();                                      // Set mailer to use SMTP
+		$mail->Host = 'smtp.sendgrid.net';                   // Specify main and backup server
+		$mail->SMTPAuth = true;                               // Enable SMTP authentication
+		$mail->Username = 'dstgermain772';                  // SMTP username
+		$mail->Password = 'ilmc9263341!';                         // SMTP password
+		$mail->SMTPSecure = 'ssl';                            // Enable encryption, 'ssl' also accepted
+		$mail->Port = 465;                                    //Set the SMTP port number - 587 for authenticated TLS
+		$mail->setFrom('bbqbarn@tiac.net', 'Purchase Confirmation');     //Set who the message is to be sent from
+		$mail->addAddress($to);  //Set an alternative reply-to address
+		$mail->WordWrap = 50;                                 // Set word wrap to 50 characters
+		$mail->isHTML(true);                                  // Set email format to HTML
+
+		$mail->Subject = 'BBQ Barn Checkout Confirmation';
+
+		$mail->Body    = '<html><body>'.
+		                 '<table width="100%" cellpadding="50" cellspacing="0" border="0" style="background:#4d0000;"><tr><td align="center">'.
+		                 '<table width="550" cellpadding="10" cellspacing="0" border="0" style="border:1px solid #900;background:#ffffff;"><tr><td valign="middle">'.
+		                 '<img src="' . get_option('siteurl') . '/wp-content/themes/roots-master/assets/img/logo1.png" width="200" style="width:200px;height:auto;"/></td>'.
+		                 '<td style="font-family: Arial, sans-serif;font-size:12px;" align="right">'.
+		                 get_option('street_address'). '<br/>'.
+		                 get_option('city_address') . ', ' . get_option('state_address') . ' ' . get_option('zip_address') . '<br/>'.
+		                 get_option('phone_1'). '<br/>'.
+		                 get_option('phone_2').
+		                 '</td>'.
+		                 '</tr><tr><tr><td colspan="2"><hr style="border-bottom: 1px solid #900;margin-top:0;margin-bottom:0;"></td></tr><td colspan="2">'.
+
+		                 '<h1 style="font-family: Arial, sans-serif;font-size:20px;margin-top: 5px;">Hello ' . $order_meta['_maxcart_order_firstname'][0] . ',</h1>'.
+		                 '<p style="font-family: Arial, sans-serif;font-size:14px;">Thank you for your order from The BBQ Barn, here are the details for your records.</p>'.
+		                 '<p style="font-family: Arial, sans-serif;font-size:14px;">Order Number: ' . $order_info->post_title . '</p>'.
+		                 '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom: 1px solid #990000;">'.
+		                 '<thead>'.
+		                 '<tr><td style="border-bottom: 1px solid #900;font-weight:600;font-family: Arial, sans-serif;font-size:14px;">Item Name</td><td style="border-bottom: 1px solid #900;font-weight:600;font-family: Arial, sans-serif;font-size:14px;">Item QTY</td><td style="border-bottom: 1px solid #900;font-weight:600;font-family: Arial, sans-serif;font-size:14px;">Item Price</td><td style="border-bottom: 1px solid #900;font-weight:600;font-family: Arial, sans-serif;font-size:14px;">Item Total</td></tr>'.
+		                 '</thead>'.
+		                 '<tbody>';
+
+		$items = unserialize($order_meta['_maxcart_order_items'][0]);
+
+		if (!is_array($items)) {
+			$items = array($items);
 		}
-		else
-		{
-			echo "Message could not be sent...";
+		foreach($items as $item) {
+			$item_post = get_post($item['id']);
+			$item_meta = get_post_meta($item['id']);
+
+			$mail->Body  .= '<tr><td style="border-bottom:1px solid #f0f0f0;padding-top:10px;padding-bottom:5px;font-family: Arial, sans-serif;font-size:14px;">'. $item_post->post_title . '</td>'.
+		                    '<td style="border-bottom:1px solid #f0f0f0;padding-top:10px;padding-bottom:5px;font-family: Arial, sans-serif;font-size:14px;">'. $item['qty'] .'</td>'.
+			                '<td style="border-bottom:1px solid #f0f0f0;padding-top:10px;padding-bottom:5px;font-family: Arial, sans-serif;font-size:14px;">$' . $item_meta['_maxcart_product_price'][0] . '</td>'.
+			                '<td style="border-bottom:1px solid #f0f0f0;padding-top:10px;padding-bottom:5px;font-family: Arial, sans-serif;font-size:14px;">$' . (floatval($item_meta['_maxcart_product_price'][0]) * floatval($item['qty'])) . '</td></tr>';
 		}
+
+		$mail->Body      .= '</tbody>'.
+		                 '</table>'.
+		                 '<p style="font-family: Arial, sans-serif;font-size:14px;">Item total: $' . $order_meta['_maxcart_order_items_total'][0] . '</p>'.
+		                 '<p style="font-family: Arial, sans-serif;font-size:14px;">Shipping total: $' . $order_meta['_maxcart_order_shipping_total'][0] . '</p>'.
+		                 '<hr style="border-bottom: 1px solid #900;margin-top:5px;margin-bottom:5px;">'.
+		                 '<p style="font-family: Arial, sans-serif;font-size:14px;font-weight:600;">Order total: $' . (floatval($order_meta['_maxcart_order_items_total'][0]) + floatval($order_meta['_maxcart_order_shipping_total'][0])) . '</p>'.
+		                 '</td></tr><tr><td colspan="2"><small>*Purchases will not be processed until paypal payment confirmation.</small></td></tr></table>'.
+		                 '</td></tr></table></body></html>';
+
+		$mail->send();
 	}
 }

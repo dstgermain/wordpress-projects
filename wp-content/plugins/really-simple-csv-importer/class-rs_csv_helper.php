@@ -46,7 +46,9 @@ class RS_CSV_Helper {
 			$index = $obj->column_indexes[$key];
 			if (isset($array[$index]) && !empty($array[$index])) {
 				$value = $array[$index];
-				unset($array[$index]);
+				if ($key !== '_maxcart_product_sku') {
+					unset($array[$index]);
+				}
 				return $value;
 			} elseif (isset($array[$index])) {
 				unset($array[$index]);

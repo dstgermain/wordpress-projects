@@ -5,6 +5,11 @@
  * Date: 3/26/15
  * Time: 7:54 PM
  */
+
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if (!class_exists('maxCartAjaxFilters')) {
 	class maxCartAjaxFilters extends maxCart {
 		const ENDLESS_PRODUCT_COUNT = 12;
@@ -38,15 +43,20 @@ if (!class_exists('maxCartAjaxFilters')) {
 
 			$categories = array();
 
-			$args = array(
-				'orderby'      => 'name',
-				'order'        => 'ASC',
-				'hide_empty'   => true,
-				'hierarchical' => true,
-				'parent'       => $_POST['category'],
-			);
+			if ($_POST['type'] === 'category') {
+				$args = array(
+					'orderby'      => 'name',
+					'order'        => 'ASC',
+					'hide_empty'   => true,
+					'hierarchical' => true,
+					'parent'       => $_POST['category'],
+				);
+				$cat_terms = get_terms( parent::MAX_CART_CATEGORY, $args);
+			} else {
+				$cat_terms = get_the_terms( $_POST['category'], parent::MAX_CART_COMPANY_CATEGORIES );
+			}
 
-			$cat_terms = get_terms( parent::MAX_CART_CATEGORY, $args);
+
 
 			foreach($cat_terms as $term) {
 				$categories[] = array(
@@ -57,6 +67,7 @@ if (!class_exists('maxCartAjaxFilters')) {
 
 			$response['categories'] = $categories;
 			$response['success'] = true;
+			$response['type'] = $_POST['type'] === 'company' ? 'company_categories' : 'category';
 
 			echo json_encode( $response );
 
@@ -117,12 +128,52 @@ if (!class_exists('maxCartAjaxFilters')) {
 
 			if ( isset ( $_POST['category'] ) ) {
 				$args['tax_query'] = array(
-					array(
+					'relation' => 'AND'
+				);
+
+				foreach ( $_POST['category'] as $cat ) {
+					array_push($args['tax_query'], array(
 						'taxonomy' => maxCart::MAX_CART_CATEGORY,
 						'field'    => 'id',
-						'terms'    => $_POST['category'],
-					)
-				);
+						'terms'    => $cat
+					));
+				}
+			}
+
+			if ( isset( $_POST['s'] ) ) {
+				$args['s'] = $_POST['s'];
+			}
+
+			if ( isset( $_POST['compatibility'] ) ) {
+				if (!isset($args['tax_query'])) {
+					$args['tax_query'] = array(
+						'relation' => 'AND'
+					);
+				}
+
+				array_push($args['tax_query'], array(
+					'taxonomy' => maxCart::MAX_CART_PART_COMPATIBILITY,
+					'field'    => 'id',
+					'terms'    => $_POST['compatibility']
+				));
+			}
+
+			if ( isset ( $_POST['company_categories'] ) &&
+			     isset ( $_POST['company_categories'][0] ) &&
+			     $_POST['company_categories'][0] != 0 ) {
+				if (!isset($args['tax_query'])) {
+					$args['tax_query'] = array(
+						'relation' => 'AND'
+					);
+				}
+
+				foreach ( $_POST['company_categories'] as $co_cat ) {
+					array_push($args['tax_query'], array(
+						'taxonomy' => maxCart::MAX_CART_COMPANY_CATEGORIES,
+						'field'    => 'id',
+						'terms'    => $co_cat
+					));
+				}
 			}
 
 			if ( isset( $_POST['price'] ) ) {
@@ -158,7 +209,7 @@ if (!class_exists('maxCartAjaxFilters')) {
 				}
 				wp_reset_postdata();
 			} else { ?>
-				<div class="margin_15 padding_15 text-center bg-warning">No Results</div>
+				<div class="col-sm-12 margin_15 padding_15 text-center bg-warning clearfix">No Results</div>
 			<?php }
 			if (count($the_query->posts) < self::ENDLESS_PRODUCT_COUNT ) {
 				$last_page = true;

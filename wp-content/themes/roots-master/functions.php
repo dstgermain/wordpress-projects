@@ -31,3 +31,16 @@ foreach ($roots_includes as $file) {
   require_once $filepath;
 }
 unset($file, $filepath);
+
+add_action( 'widgets_init', 'theme_slug_widgets_init' );
+function theme_slug_widgets_init() {
+  register_sidebar( array(
+      'name' => __( 'MaxCart Sidebar', 'roots' ),
+      'id' => 'sidebar-1',
+      'description' => __( 'Widgets in this area will be shown on all product archive pages.', 'roots' ),
+      'before_widget' => '<li id="%1$s" class="widget %2$s">',
+      'after_widget'  => '</li>',
+      'before_title'  => '<h2 class="widgettitle">',
+      'after_title'   => '</h2>',
+  ) );
+}

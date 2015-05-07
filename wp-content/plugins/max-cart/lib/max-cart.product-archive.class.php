@@ -6,6 +6,10 @@
  * Time: 9:17 PM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 class maxCartProductArchive extends maxCart {
 	public $breadcrumbs = '';
 	public $products = null;
@@ -32,6 +36,10 @@ class maxCartProductArchive extends maxCart {
 					'terms'    => get_query_var(maxCart::MAX_CART_CATEGORY),
 				)
 			);
+		}
+
+		if (get_query_var('s')) {
+			$args['s'] = get_query_var('s');
 		}
 
 		$this->products = new WP_Query($args);

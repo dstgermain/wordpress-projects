@@ -6,24 +6,34 @@
  * Time: 6:49 PM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 class maxCartCompany extends maxCart {
 	public $company_id = 0;
 	public $company_name = '';
 	public $company_logo = '';
 	public $company_products = array();
 	public $breadcrumbs = '';
+	public $company_categories = array();
 
 	public function __construct() {
 		self::set_company_id();
 		self::set_company_name();
 		self::set_company_products();
 		self::set_breadcrumbs();
+		self::set_categories();
 	}
 
 	private function set_company_id() {
 		global $post;
 
 		$this->company_id = $post->ID;
+	}
+
+	private function set_categories() {
+		$this->company_categories = get_the_terms( $this->company_id, parent::MAX_CART_COMPANY_CATEGORIES );
 	}
 
 	private function set_company_name() {

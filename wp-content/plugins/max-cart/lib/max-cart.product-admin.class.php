@@ -1,5 +1,9 @@
 <?php
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 /**
  * Created by PhpStorm.
  * User: dstgermain
@@ -26,6 +30,7 @@ class maxCartProductAdmin extends maxCart {
 	private $side_meta_keys = array(
 		parent::P_COMPANY_KEY    => 'companyID',
 		parent::P_PRICE_KEY      => 'productPrice',
+		parent::P_INSTORE_KEY    => 'productInStore',
 		parent::P_SKU_KEY        => 'productSku',
 		parent::P_STOCK_KEY      => 'productStock'
 	);
@@ -96,12 +101,17 @@ class maxCartProductAdmin extends maxCart {
 		global $post;
 
 		$price = get_post_meta($post->ID, parent::P_PRICE_KEY, true);
+		$instore = get_post_meta($post->ID, parent::P_INSTORE_KEY, true) === 'on' ? 'checked': '';
 
 		?>
 		<table>
 			<tr>
 				<td><label for="productPrice">Price:</label></td>
 				<td><input type="text" name="productPrice" value="<?php echo $price; ?>"/></td>
+			</tr>
+			<tr>
+				<td><label for="productInStore">Only Available in Store</label></td>
+				<td><input type="checkbox" name="productInStore" <?php echo $instore ?>/></td>
 			</tr>
 		</table>
 	<?php

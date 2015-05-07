@@ -8,6 +8,31 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="<?php echo esc_url(home_url('/')); ?>"></a>
+      <div class="store-info">
+        <address class="address">
+          <?php echo get_option('street_address'); ?><br/>
+          <?php echo get_option('city_address'); ?>, <?php echo get_option('state_address'); ?> <?php echo get_option('zip_address'); ?>
+        </address>
+        <div class="phone-numbers">
+          <?php echo get_option('phone_1'); ?><br/>
+          <?php echo get_option('phone_2'); ?>
+        </div>
+        <?php $search = "";
+        if ( get_query_var('s') ) {
+          $search = get_query_var('s');
+        } ?>
+        <form role="search" method="get" class="search-form form-inline"
+              action="/">
+          <label class="sr-only">Search for:</label>
+
+          <div class="input-group">
+            <input type="search" value="<?php echo $search; ?>" name="s" class="search-field form-control" placeholder="Search.." data-type="s">
+						<span class="input-group-btn">
+                              <button type="submit" class="search-submit btn btn-default">Search</button>
+						</span>
+          </div>
+        </form>
+      </div>
     </div>
 
     <nav class="collapse navbar-collapse" role="navigation">

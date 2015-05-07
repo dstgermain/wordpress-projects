@@ -1,5 +1,9 @@
 <?php
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if ( ! class_exists( 'maxCartView' ) ) {
 	class maxCartView extends maxCart {
 		// Manual loading of UPS Lib
@@ -175,10 +179,11 @@ if ( ! class_exists( 'maxCartView' ) ) {
 				return false;
 			}
 
-			$paypal_use_sandbox = true;
-			$paypal_email       = 'info_api1.danstgermain.com';
-			$paypal_password    = 'DRD8JFMNCXNC6VAM';
-			$paypal_api_key     = 'Azblg4YAMFzmrInpK.67yO5C34C4ArM29RpuckJkh5SSH5yxDhpo.s2x';
+			$paypal_use_sandbox = get_option( 'pp_use_sandbox', false ) === 'on';
+			$paypal_email       = get_option( 'pp_email', false );
+			$paypal_password    = get_option( 'pp_password', false );
+			$paypal_api_key     = get_option( 'pp_api_key', false );
+
 			$paypalmode         = '';
 
 			if ( $paypal_use_sandbox ) {
@@ -207,7 +212,7 @@ if ( ! class_exists( 'maxCartView' ) ) {
 			$p_data .= '&PAYMENTREQUEST_0_SHIPTOZIP=' . $_POST['zipcode'] .
 			           '&NOSHIPPING=0' . //set 1 to hide buyer's shipping address, in-case products that does not require shipping
 			           '&PAYMENTREQUEST_0_ITEMAMT=' . urlencode( $_SESSION['maxcart_cart']['items_total'] ) .
-			           '&PAYMENTREQUEST_0_HANDLINGAMT=' . urlencode( $_POST['shipping_cost'] ) .
+			           '&PAYMENTREQUEST_0_SHIPPINGAMT=' . urlencode( $_POST['shipping_cost'] ) .
 			           '&PAYMENTREQUEST_0_AMT=' . urlencode( $grand_total ) .
 			           '&PAYMENTREQUEST_0_CURRENCYCODE=' . urlencode( 'USD' ) .
 			           '&LOCALECODE=US' . //PayPal pages to match the language on your website.
@@ -230,10 +235,11 @@ if ( ! class_exists( 'maxCartView' ) ) {
 		public function do_express_checkout() {
 			//we will be using these two variables to execute the "DoExpressCheckoutPayment"
 			//Note: we haven't received any payment yet.
-			$paypal_use_sandbox = true;
-			$paypal_email       = 'info_api1.danstgermain.com';
-			$paypal_password    = 'DRD8JFMNCXNC6VAM';
-			$paypal_api_key     = 'Azblg4YAMFzmrInpK.67yO5C34C4ArM29RpuckJkh5SSH5yxDhpo.s2x';
+			$paypal_use_sandbox = get_option( 'pp_use_sandbox', false ) === 'on';
+			$paypal_email       = get_option( 'pp_email', false );
+			$paypal_password    = get_option( 'pp_password', false );
+			$paypal_api_key     = get_option( 'pp_api_key', false );
+
 			$paypalmode         = '';
 
 			if ( $paypal_use_sandbox ) {
@@ -248,28 +254,13 @@ if ( ! class_exists( 'maxCartView' ) ) {
 			}
 
 			//Grand total including all tax, insurance, shipping cost and discount
-			$grand_total = ( $_SESSION['maxcart_cart']['items_total'] + $_POST['shipping_cost'] );
+			$grand_total = ( floatval($_SESSION['maxcart_cart']['items_total']) + floatval($_SESSION['maxcart_cart']['shipping_total']) );
 
 			$p_data = '&TOKEN=' . urlencode( $token ) .
 			          '&PAYERID=' . urlencode( $payer_id ) .
-			          '&PAYMENTREQUEST_0_PAYMENTACTION=' . urlencode( "SALE" );
-
-			$item_num = 0;
-
-			foreach ( $_SESSION['maxcart_cart']['items'] as $product ) {
-				$p_data .= '&L_PAYMENTREQUEST_0_NAME' . $item_num . '=' . urlencode( $product['name'] ) .
-				           '&L_PAYMENTREQUEST_0_NUMBER' . $item_num . '=' . urlencode( $product['sku'] ) .
-				           '&L_PAYMENTREQUEST_0_AMT' . $item_num . '=' . urlencode( $product['price'] ) .
-				           '&L_PAYMENTREQUEST_0_QTY' . $item_num . '=' . urlencode( $product['qty'] );
-
-				$item_num ++;
-			}
-
-			$p_data .= '&PAYMENTREQUEST_0_ITEMAMT=' . urlencode( $_SESSION['maxcart_cart']['items_total'] ) .
-			           '&PAYMENTREQUEST_0_HANDLINGAMT=' . urlencode( $_POST['shipping_cost'] ) .
-			           '&PAYMENTREQUEST_0_AMT=' . urlencode( $grand_total ) .
-			           '&PAYMENTREQUEST_0_CURRENCYCODE=' . urlencode( 'USD' ) .
-			           '&LOCALECODE=US';
+			          '&PAYMENTREQUEST_0_PAYMENTACTION=' . urlencode( "SALE" ) .
+			          '&PAYMENTREQUEST_0_AMT=' . urlencode( $grand_total ) .
+			          '&PAYMENTREQUEST_0_CURRENCYCODE=' . urlencode( 'USD' );
 
 			//We need to execute the "DoExpressCheckoutPayment" at this point to Receive payment from user.
 			$paypal               = new MyPayPal();

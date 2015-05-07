@@ -30,9 +30,10 @@ if (typeof maxcart !== typeof 'object') {
     maxcart.manage_gallery = function maxcartManageGallery() {
         var $ids = $('.js-maxcart-product-ids');
         $('.js-maxcart-manage-gallery').click(function() {
-            var gallery_sc = '[gallery ids="' + $ids.val() + '"]';
+            var gallery_sc = '[gallery ids="' + ($ids.val() ? $ids.val() : '0') + '"]';
 
             wp.media.gallery.edit(gallery_sc).on('update', function(g) {
+                console.log(gallery_sc);
                 var id_array = [];
                 $.each(g.models, function(id, img) { id_array.push(img.id); });
                 $ids.val(id_array.join(','));

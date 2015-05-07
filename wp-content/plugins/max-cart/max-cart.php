@@ -29,7 +29,8 @@ function max_cart_setup() {
 		'ajax-filters',
 		'filters',
 		'checkout',
-		'paypal-ipn'
+		'paypal-ipn',
+		'store-info'
 	);
 
 	foreach ($includes as $include) {
@@ -159,3 +160,13 @@ function maxcart_register_widgets() {
 }
 
 add_action( 'widgets_init', 'maxcart_register_widgets' );
+
+add_filter('template_include','my_custom_search_template');
+
+function my_custom_search_template($template){
+	global $wp_query;
+	if (!$wp_query->is_search)
+		return $template;
+
+	return WP_PLUGIN_DIR . '/max-cart/templates/product-archive.php';
+}

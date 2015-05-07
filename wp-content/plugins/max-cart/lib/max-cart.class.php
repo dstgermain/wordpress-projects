@@ -5,6 +5,11 @@
  * Date: 3/1/15
  * Time: 8:38 AM
  */
+
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if (!class_exists('maxCart')) {
 	class maxCart {
 		// post_type constants
@@ -16,7 +21,11 @@ if (!class_exists('maxCart')) {
 
 		// product taxonomy
 		const MAX_CART_CATEGORY = 'maxcart_category';
+		const MAX_CART_PART_COMPATIBILITY = 'maxcart_compatible_brand';
 		const MAX_CART_VARIATION = 'maxcart_variation';
+
+		// company post_type
+		const MAX_CART_COMPANY_CATEGORIES = 'maxcart_company_categories';
 
 		// product_meta constants
 		const P_GALLERY_KEY = '_maxcart_product_gallery';
@@ -28,6 +37,7 @@ if (!class_exists('maxCart')) {
 
 		const P_COMPANY_KEY = '_maxcart_company_id';
 		const P_PRICE_KEY = '_maxcart_product_price';
+		const P_INSTORE_KEY = '_maxcart_product_instore';
 		const P_TAX_EXEMPT_KEY = '_maxcart_product_taxexempt';
 		const P_TAX_KEY = '_maxcart_product_tax';
 		const P_SKU_KEY = '_maxcart_product_sku';
@@ -49,9 +59,13 @@ if (!class_exists('maxCart')) {
 			// adding Company post_type
 			add_action( 'init', array( $this, 'product_company_init' ) );
 			add_filter( 'post_updated_messages', array( $this, 'product_company_updated_messages' ) );
+			add_action( 'init', array( $this, 'create_company_categories_init' ) );
 
 			// adding Category Taxonomy
 			add_action( 'init', array( $this, 'create_categories_init' ), 0 );
+
+			// adding Brand Compatibility
+			add_action( 'init', array( $this, 'create_compatibility_init' ), 0 );
 
 			// adding Variation Taxonomy
 			add_action( 'init', array( $this, 'create_variations_init' ), 0 );
@@ -127,7 +141,7 @@ if (!class_exists('maxCart')) {
 				'hierarchical'       => true,
 				'menu_position'      => 5,
 				'menu_icon'          => 'dashicons-cart',
-				'supports'           => array( 'title', 'editor' )
+				'supports'           => array( 'title', 'editor', 'thumbnail' )
 			);
 
 			register_post_type( self::MAX_CART_PRODUCT, $args );
@@ -244,12 +258,43 @@ if (!class_exists('maxCart')) {
 				'rewrite'            => array( 'slug' => 'companies' ),
 				'capability_type'    => 'post',
 				'has_archive'        => true,
-				'hierarchical'       => false,
+				'hierarchical'       => true,
 				'menu_position'      => null,
 				'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt' )
 			);
 
 			register_post_type( self::MAX_CART_COMPANY, $args );
+		}
+
+		/**
+		 * Product categories taxonomy
+		 * @author Daniel St. Germain
+		 */
+		function create_company_categories_init() {
+			$labels = array(
+				'name'              => _x( 'Company Categories', 'taxonomy general name' ),
+				'singular_name'     => _x( 'Company Category', 'taxonomy singular name' ),
+				'search_items'      => __( 'Search Company Categories' ),
+				'all_items'         => __( 'All Company Categories' ),
+				'parent_item'       => __( 'Parent Company Category' ),
+				'parent_item_colon' => __( 'Parent Company Category:' ),
+				'edit_item'         => __( 'Edit Company Category' ),
+				'update_item'       => __( 'Update Company Category' ),
+				'add_new_item'      => __( 'Add Company New Category' ),
+				'new_item_name'     => __( 'New Company Category Name' ),
+				'menu_name'         => __( 'Product Company Categories' ),
+			);
+
+			$args = array(
+				'hierarchical'      => true,
+				'labels'            => $labels,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'query_var'         => true,
+				'rewrite'           => false,
+			);
+
+			register_taxonomy( self::MAX_CART_COMPANY_CATEGORIES, array( self::MAX_CART_COMPANY, self::MAX_CART_PRODUCT ), $args );
 		}
 
 		/**
@@ -327,6 +372,37 @@ if (!class_exists('maxCart')) {
 			);
 
 			register_taxonomy( self::MAX_CART_CATEGORY, array( self::MAX_CART_PRODUCT ), $args );
+		}
+
+		/**
+		 * Product Part Compatibility taxonomy
+		 * @author Daniel St. Germain
+		 */
+		function create_compatibility_init() {
+			$labels = array(
+				'name'              => _x( 'Compatible brand', 'taxonomy general name' ),
+				'singular_name'     => _x( 'Compatible brand', 'taxonomy singular name' ),
+				'search_items'      => __( 'Compatible brands' ),
+				'all_items'         => __( 'All Compatible brands' ),
+				'parent_item'       => __( 'Parent Compatible brand' ),
+				'parent_item_colon' => __( 'Parent Compatible brand:' ),
+				'edit_item'         => __( 'Edit Compatible brand' ),
+				'update_item'       => __( 'Update Compatible brand' ),
+				'add_new_item'      => __( 'Add New Compatible brand' ),
+				'new_item_name'     => __( 'New Compatible brand' ),
+				'menu_name'         => __( 'Compatible brands' ),
+			);
+
+			$args = array(
+				'hierarchical'      => true,
+				'labels'            => $labels,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'query_var'         => true,
+				'rewrite'           => array( 'slug' => 'compatible-brands' ),
+			);
+
+			register_taxonomy( self::MAX_CART_PART_COMPATIBILITY, array( self::MAX_CART_PRODUCT ), $args );
 		}
 
 		/**

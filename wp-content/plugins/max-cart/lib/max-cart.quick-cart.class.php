@@ -1,5 +1,9 @@
 <?php
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 /**
  * Created by PhpStorm.
  * User: dstgermain

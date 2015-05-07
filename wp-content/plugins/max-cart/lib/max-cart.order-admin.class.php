@@ -6,6 +6,10 @@
  * Time: 1:38 PM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if ( ! class_exists('maxCartOrders') ) {
 	define(ADMIN_URL, admin_url()); // Helper
 
@@ -22,8 +26,17 @@ if ( ! class_exists('maxCartOrders') ) {
 			if($_GET['order']) {
 				$this->maxcart_order();
 			} else {
-				$this->maxcart_orders_list();
+				$offset = isset( $_GET['page_number'] ) ? $_GET['page_number'] : 1;
+
+				if ( isset ( $_GET['delete'] ) ) {
+					$this->maxcart_delete_order($_GET['delete']);
+				}
+				$this->maxcart_orders_list($offset);
 			}
+		}
+
+		private function maxcart_delete_order($id) {
+			wp_delete_post($id, true);
 		}
 
 		private function maxcart_order() {
@@ -136,22 +149,41 @@ if ( ! class_exists('maxCartOrders') ) {
 			}
 		}
 
-		private function maxcart_orders_list() {
+		private function maxcart_orders_list( $offset ) {
+			$post_offset = intval( $offset ) - 1;
+			if ($post_offset !== 0) {
+				$post_offset = $post_offset * 10;
+			}
 			$args        = array(
-				'posts_per_page' => 20,
-				'offset'         => 0,
+				'posts_per_page' => 10,
+				'offset'         => $post_offset,
 				'orderby'        => 'post_date',
 				'order'          => 'DESC',
 				'post_type'      => maxCart::MAX_CART_ORDER,
 				'post_status'    => 'private'
 			);
-			$posts_array = get_posts( $args );
+			$posts_array = new WP_Query( $args );
+
+			$current_search = '';
+			if ( isset( $_GET['search_order_number'] ) ) {
+				$current_search = $_GET['search_order_number'];
+				if ($posts_array) {
+					$posts_array->posts = array( get_page_by_title( $_GET['search_order_number'], 'OBJECT', maxCart::MAX_CART_ORDER ) );
+				}
+			}
 			?>
 			<div class="wrap">
 				<div id="icon-users" class="icon32"></div>
 				<h2>Orders</h2>
 
-				<p>Below is a list of all orders.</p>
+				<form action="/wp-admin/edit.php?post_type=maxcart_product&page=maxcart-orders">
+					<input type="text" name="search_order_number" id="search_order_number" value="<?php echo $current_search; ?>" placeholder="Search Order Numbers..."/>
+					<input type="hidden" name="post_type" id="post_type" value="maxcart_product"/>
+					<input type="hidden" name="page" id="page" value="maxcart-orders"/>
+					<input type="submit" class="button button-primary"/>
+				</form>
+
+				<p>Below is a list of orders. Total Orders: <?php echo $posts_array->found_posts; ?></p>
 				<small>Please double check PayPal before shipping items.</small>
 
 				<table class="widefat">
@@ -164,17 +196,17 @@ if ( ! class_exists('maxCartOrders') ) {
 						<th>Items (QTY &times; SKU)</th>
 						<th>Purchase Total</th>
 						<th>PayPal Approval</th>
-<!--						<th>Delete</th>-->
+						<th>Delete</th>
 					</tr>
 					</thead>
 					<tbody>
-					<?php foreach ( $posts_array as $order ) : $meta = get_post_meta( $order->ID ); ?>
-						<tr valign="middle">
-							<td><a href="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']; ?>&order=<?php echo $order->post_title; ?>"><?php echo $order->post_title; ?></a></td>
-							<td><?php echo $order->post_date; ?></td>
-							<td><?php echo $meta['_maxcart_order_firstname'][0] . ' ' . $meta['_maxcart_order_lastname'][0]; ?></td>
-							<td><?php echo $meta['_maxcart_order_email'][0]; ?></td>
-							<td>
+					<?php foreach ( $posts_array->posts as $order ) : $meta = get_post_meta( $order->ID ); ?>
+						<tr>
+							<td valign="middle"><a href="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']; ?>&order=<?php echo $order->post_title; ?>"><?php echo $order->post_title; ?></a></td>
+							<td valign="middle"><?php echo $order->post_date; ?></td>
+							<td valign="middle"><?php echo $meta['_maxcart_order_firstname'][0] . ' ' . $meta['_maxcart_order_lastname'][0]; ?></td>
+							<td valign="middle"><?php echo $meta['_maxcart_order_email'][0]; ?></td>
+							<td valign="middle">
 								<?php
 								$products = unserialize( $meta['_maxcart_order_items'][0] );
 								if ($products) {
@@ -186,16 +218,25 @@ if ( ! class_exists('maxCartOrders') ) {
 								}
 								?>
 							</td>
-							<td>
+							<td valign="middle">
 								$<?php echo floatval( $meta['_maxcart_order_items_total'][0] ) + floatval( $meta['_maxcart_order_shipping_total'][0] ); ?></td>
-							<td>
+							<td valign="middle">
 								<?php echo $meta['_maxcart_order_approved'][0]; ?>
 							</td>
-<!--							<td><input name="delete_order" type="submit" class="button button-primary button-large" id="delete_order" value="x"></td>-->
+							<td><a href="/wp-admin/edit.php?post_type=maxcart_product&page=maxcart-orders&delete=<?php echo $order->ID; ?>" class="button button-primary">&times;</a></td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+				<?php if ( $posts_array->max_num_pages > 1 ) : ?>
+					<ul class="orders-pagination">
+				    <?php for ($i = 1; $i <= $posts_array->max_num_pages; $i++) : $current = intval($offset) === $i ? 'active' : '' ; ?>
+					    <li class="<?php echo $current; ?>">
+						    <a href="/wp-admin/edit.php?post_type=maxcart_product&page=maxcart-orders&page_number=<?php echo $i; ?>"><?php echo $i; ?></a>
+					    </li>
+				    <?php endfor; ?>
+					</ul>
+				<?php endif; ?>
 			</div>
 		<?php
 		}

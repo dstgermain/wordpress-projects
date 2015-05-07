@@ -7,6 +7,10 @@
  * Time: 3:54 PM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if ( ! class_exists( 'maxCartCheckout' ) ) {
 	class maxCartCheckout extends maxCart {
 		public function __construct() {

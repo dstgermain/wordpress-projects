@@ -177,15 +177,6 @@ a[disabled] {
     top: 0;
     z-index: 99998; //just below the admin bar
 
-    &:hover {
-        .maxcart-quickcart-table {
-            display: block;
-        }
-        .maxcart-quickcart-inner {
-            border-radius: 0;
-        }
-    }
-
     &.active {
         .maxcart-quickcart-inner {
             border-radius: 0;
@@ -273,11 +264,13 @@ a[disabled] {
         overflow: hidden;
         transition: opacity .2s ease;
         color: #222222;
+        width: 100%;
 
         img {
             position: absolute;
-            top: 0;
-            bottom: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         &.missing {
@@ -355,7 +348,7 @@ a[disabled] {
 
     .max-filter {
         position: relative;
-        max-height: 230px;
+        max-height: 350px;
         overflow: hidden;
         border-bottom: 2px solid #f0f0f0;
 
@@ -364,7 +357,7 @@ a[disabled] {
             display: block;
             position: absolute;
             right: 0;
-            top: 220px;
+            top: 330px;
             height: 40px;
             z-index: 10;
             left: 0;
@@ -380,7 +373,7 @@ a[disabled] {
     ul.max-filters {
         list-style: none;
         padding: 0;
-        max-height: 195px;
+        max-height: 350px;
         overflow-y: scroll;
         overflow-x: hidden;
 
@@ -662,6 +655,43 @@ a[disabled] {
     .bg-danger {
         padding: 5px;
         min-height: 1em;
+    }
+}
+
+.max-filters h4 {
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    .filters-toggle a {
+        &,
+        &:visited {
+            display: block;
+            padding: 10px;
+            text-align: center;
+            background: #900;
+            margin: 0 -15px 10px;
+            color: #fff;
+            transition: all .2s ease;
+        }
+
+        &:hover,
+        &:active {
+            background: darken(#900, 15%);
+            color: #fff;
+            text-decoration: none;
+        }
+    }
+    .max-filters-toggle {
+        display: none;
+    }
+    .max-filters .pull-left,
+    .max-filters .pull-right {
+        float: none !important;
+    }
+
+    .max-filters h4 {
+        margin-bottom: 10px;
     }
 }
 

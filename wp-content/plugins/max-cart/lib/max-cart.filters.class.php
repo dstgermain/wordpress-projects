@@ -6,17 +6,49 @@
  * Time: 11:51 AM
  */
 
+if (strpos($_SERVER['REQUEST_URI'], basename(__FILE__)) !== false) {
+	die();
+}
+
 if ( ! class_exists( 'maxCartFilters' ) ) {
 	class maxCartFilters extends maxCart {
 		private $categories = array();
+		private $compatibility = array();
 		private $companies = array();
-		public $prices = array();
 		public $filters = array();
 
 		public function __construct() {
 			self::set_companies();
 			self::set_categories();
-			self::set_prices();
+			self::set_compatibility();
+		}
+
+		private function set_compatibility() {
+
+			$args = array(
+				'orderby'      => 'name',
+				'order'        => 'ASC',
+				'hide_empty'   => true,
+				'hierarchical' => true,
+				'parent'       => 0,
+			);
+
+			$comp_terms = get_terms( maxCart::MAX_CART_PART_COMPATIBILITY, $args );
+
+			foreach ( $comp_terms as $term ) {
+				$this->compatibility[] = array(
+					'id'   => $term->term_id,
+					'name' => $term->name
+				);
+			 }
+
+
+			if ( count( $this->compatibility ) &&
+			     !get_query_var( maxCart::MAX_CART_PART_COMPATIBILITY ) &&
+			     get_query_var( maxCart::MAX_CART_CATEGORY ) !== 'accessory' &&
+			     get_query_var( maxCart::MAX_CART_CATEGORY ) !== 'grills' ) {
+				$this->filters['compatibility'] = $this->compatibility;
+			}
 		}
 
 		private function set_categories() {
@@ -27,6 +59,12 @@ if ( ! class_exists( 'maxCartFilters' ) ) {
 				'hierarchical' => true,
 				'parent'       => 0,
 			);
+
+			if ( get_query_var( maxCart::MAX_CART_CATEGORY ) ) {
+				$term = get_term_by( 'slug', get_query_var( maxCart::MAX_CART_CATEGORY ), maxCart::MAX_CART_CATEGORY );
+
+				$args['parent'] = $term->term_id;
+			}
 
 			$cat_terms = get_terms( parent::MAX_CART_CATEGORY, $args );
 
@@ -47,12 +85,11 @@ if ( ! class_exists( 'maxCartFilters' ) ) {
 				'post_type' => self::MAX_CART_COMPANY,
 				'orderby'   => 'title',
 				'order'     => 'ASC',
-
 			);
 
 			$company_query = new WP_Query( $args );
 
-			if ( $company_query->have_posts() ) {
+			if ( $company_query->have_posts() && get_query_var( maxCart::MAX_CART_CATEGORY ) !== 'parts' ) {
 				foreach ( $company_query->posts as $company ) {
 					$this->companies[] = array(
 						'id'   => $company->ID,
@@ -66,73 +103,44 @@ if ( ! class_exists( 'maxCartFilters' ) ) {
 			}
 		}
 
-		private function set_prices() {
-			$args = array(
-				'post_type'      => parent::MAX_CART_PRODUCT,
-				'orderby'        => 'meta_value_num',
-				'meta_key'       => parent::P_PRICE_KEY,
-				'order'          => 'DESC',
-				'posts_per_page' => 1
-			);
-
-			$query_high = new WP_Query( $args );
-
-			if ( $query_high->have_posts() ) {
-				$price_high = get_post_meta( $query_high->post->ID, parent::P_PRICE_KEY, true );
-
-				for ( $low = 0; $low < $price_high; $low += 25 ) {
-					$high = $low + 24;
-					array_push( $this->prices, $low . '-' . $high );
-				}
-			}
-		}
-
 		public function print_filters() {
-			if ( is_post_type_archive( parent::MAX_CART_PRODUCT ) ) :
-				?>
-				<form role="search" method="get" class="search-form form-inline"
-				      action="http://www.dev.wordpressproject.com/">
-					<label class="sr-only">Search for:</label>
-
-					<div class="input-group">
-						<input type="search" value="" name="s" class="search-field form-control" placeholder="Search Exeter Dental" required="">
-						<span class="input-group-btn">
-                              <button type="submit" class="search-submit btn btn-default">Search</button>
-						</span>
-					</div>
-				</form>
+			$search = "";
+			if ( get_query_var('s') ) {
+				$search = get_query_var('s');
+			}?>
+			<li>
 				<div class="max-filters">
-					<?php foreach ( $this->filters as $key => $filter ) : ?>
-						<div class="max-filter">
-							<h5 class="max-filter-title"><?php echo $key; ?></h5>
-							<ul class="max-filters">
-								<?php foreach ( $filter as $item ) : ?>
-									<li class="js-add-children_<?php echo $item['id']; ?>">
-										<input type="checkbox" class="hidden max-checkbox-input"
-										       data-type="<?php echo $key; ?>" value="<?php echo $item['id']; ?>"/>
-										<label class="js-max-checkbox max-checkbox"><?php echo $item['name']; ?></label>
-									</li>
-								<?php endforeach; ?>
-							</ul>
-						</div>
-					<?php endforeach; ?>
-					<?php if ( count( $this->prices ) > 1 ) : ?>
-						<div class="max-filter">
-							<h5 class="max-filter-title">Price</h5>
-							<span class="max-current-filter"></span>
-							<ul class="max-filters">
-								<?php foreach ( $this->prices as $item ) : ?>
-									<li>
-										<input type="checkbox" class="hidden max-checkbox-input" data-type="price"
-										       value="<?php echo $item; ?>"/>
-										<label class="js-max-checkbox max-checkbox"><?php echo $item; ?></label>
-									</li>
-								<?php endforeach; ?>
-							</ul>
-						</div>
-					<?php endif; ?>
+					<div class="visible-xs filters-toggle">
+						<a href="#" class="js-open-filters">Filters</a>
+					</div>
+					<div class="max-filters-toggle">
+						<?php foreach ( $this->filters as $key => $filter ) { ?>
+							<div class="max-filter filter-<?php echo $key; ?>">
+								<h5 class="max-filter-title"><?php echo $key === 'compatibility' ? 'Grill Part Brands ' : $key; ?></h5>
+								<ul class="max-filters">
+									<?php foreach ( $filter as $item ) : ?>
+										<li class="js-add-children_<?php echo $item['id']; ?>">
+											<input type="checkbox" class="hidden max-checkbox-input"
+											       data-type="<?php echo $key; ?>" value="<?php echo $item['id']; ?>"/>
+											<label class="js-max-checkbox max-checkbox" data-filter-name="<?php echo $item['name']; ?>">
+												<?php echo $item['name']; ?>
+											</label>
+										</li>
+									<?php endforeach; ?>
+								</ul>
+							</div>
+						<?php } ?>
+					</div>
+					<?php if ( get_query_var( maxCart::MAX_CART_CATEGORY ) ) : ?>
+						<?php $term = get_term_by( 'slug', get_query_var( maxCart::MAX_CART_CATEGORY ),  maxCart::MAX_CART_CATEGORY )?>
+						<input type="hidden" data-type="category" value="<?php echo $term->term_id; ?>"/>
+				    <?php endif; ?>
+					<?php if ($search && $search !== '') : ?>
+						<input type="hidden" data-type="s" value="<?php echo $search; ?>"/>
+				    <?php endif; ?>
 				</div>
-			<?php endif;
+			</li>
+		<?php
 		}
 	}
 }
